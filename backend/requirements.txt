@@ -1,0 +1,14 @@
+fastapi
+uvicorn[standard]
+langchain
+langchain-community
+langchain-openai
+langchain_groq
+faiss-cpu # Or faiss-gpu if you have a compatible GPU
+python-dotenv
+tiktoken # For token counting in LangChain
+# Additional dependencies for the mental health model
+pydantic
+scikit-learn
+numpy
+pandas
