@@ -1,0 +1,5 @@
+# M1 regularised linear model (ENGINEERING.md 16.4).
+estimator: [ridge, huber]
+alpha: {low: 1.0e-4, high: 10, log: true}
+huber_epsilon: {low: 1.1, high: 2.0}
+tuning: {sampler: tpe, trials: 40, seed: 20261007}

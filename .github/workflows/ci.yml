@@ -1,0 +1,91 @@
+# Pull-request checks (ENGINEERING.md 28.2). Every third-party action is pinned to a commit SHA.
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+      - name: Lint and format
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+      - name: Types (strict on src)
+        run: uv run mypy
+      - name: Module boundaries (import-linter, ENGINEERING.md 6.2)
+        run: uv run lint-imports
+      - name: Configuration for every environment
+        run: uv run nsefc config validate
+      - name: API contract is current and fixtures are valid
+        run: |
+          uv run nsefc contract export --check
+          uv run nsefc contract validate
+      - name: Tests (unit, property, leakage, contract, repository rules)
+        run: uv run pytest -m "not slow and not network"
+      - name: Known vulnerabilities in locked dependencies (pip-audit)
+        run: |
+          uv export --frozen --no-emit-project --format requirements-txt -o "$RUNNER_TEMP/requirements.txt"
+          uvx pip-audit --requirement "$RUNNER_TEMP/requirements.txt" --disable-pip --require-hashes
+
+  web:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          package_json_file: web/package.json
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - name: Known vulnerabilities (pnpm audit)
+        run: pnpm audit --audit-level high
+      - name: Generated types match the contract
+        run: pnpm check:types
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - name: Unit, page and language-rule tests
+        run: pnpm test
+      - run: pnpm build
+      - name: Bundle budget (NFR-04)
+        run: pnpm check:size
+      - name: Browser for the smoke test
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Smoke test and accessibility in a real browser (Playwright + axe)
+        run: pnpm e2e
+
+  repository:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # Actions pinned to commit SHAs: tests/unit/test_repository.py (python job).
+      - name: No third-party data files committed outside NSE Data
+        run: |
+          found=$(git -c core.quotepath=off ls-files -- '*.pdf' '*.xlsx' '*.xls' | grep -v '^NSE Data/' || true)
+          if [ -n "$found" ]; then
+            echo "Raw source files must go to private storage, not git:"; echo "$found"; exit 1
+          fi

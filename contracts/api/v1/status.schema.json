@@ -1,0 +1,194 @@
+{
+  "$defs": {
+    "ModelRef": {
+      "additionalProperties": false,
+      "properties": {
+        "model_id": {
+          "title": "Model Id",
+          "type": "string"
+        },
+        "label": {
+          "description": "Display name, e.g. 'LightGBM' or 'No-change baseline'",
+          "title": "Label",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "model_id",
+        "label",
+        "version"
+      ],
+      "title": "ModelRef",
+      "type": "object"
+    },
+    "Notice": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "severity": {
+          "default": "info",
+          "enum": [
+            "info",
+            "warning"
+          ],
+          "title": "Severity",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "severity"
+      ],
+      "title": "Notice",
+      "type": "object"
+    },
+    "PipelineStatus": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "succeeded",
+            "failed",
+            "running",
+            "data_not_yet_available",
+            "quarantined",
+            "skipped"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "finished_at": {
+          "anyOf": [
+            {
+              "description": "ISO 8601 with offset, e.g. ...Z",
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Finished At"
+        },
+        "primary_source": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Primary Source"
+        },
+        "fallback_used": {
+          "title": "Fallback Used",
+          "type": "boolean"
+        },
+        "dq": {
+          "enum": [
+            "passed",
+            "held",
+            "failed",
+            "not_run"
+          ],
+          "title": "Dq",
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "finished_at",
+        "primary_source",
+        "fallback_used",
+        "dq"
+      ],
+      "title": "PipelineStatus",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Mutable pointer to the current release. Cached for 60 seconds (22.2).",
+  "properties": {
+    "api_version": {
+      "const": "1",
+      "default": "1",
+      "title": "Api Version",
+      "type": "string"
+    },
+    "release_id": {
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}\\.[0-9a-f]{7,64}$",
+      "title": "Release Id",
+      "type": "string"
+    },
+    "generated_at": {
+      "description": "ISO 8601 with offset, e.g. ...Z",
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "latest_session": {
+      "format": "date",
+      "title": "Latest Session",
+      "type": "string"
+    },
+    "next_session": {
+      "format": "date",
+      "title": "Next Session",
+      "type": "string"
+    },
+    "stale_after": {
+      "description": "When the next release is due; past this time the frontend shows the stale banner",
+      "format": "date-time",
+      "title": "Stale After",
+      "type": "string"
+    },
+    "pipeline": {
+      "$ref": "#/$defs/PipelineStatus"
+    },
+    "champion": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ModelRef"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "notices": {
+      "items": {
+        "$ref": "#/$defs/Notice"
+      },
+      "title": "Notices",
+      "type": "array"
+    }
+  },
+  "required": [
+    "api_version",
+    "release_id",
+    "generated_at",
+    "latest_session",
+    "next_session",
+    "stale_after",
+    "pipeline",
+    "champion",
+    "notices"
+  ],
+  "title": "Status",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nsefc.local/contracts/api/v1/status.schema.json"
+}

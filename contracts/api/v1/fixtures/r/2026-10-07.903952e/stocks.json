@@ -1,0 +1,114 @@
+{
+  "as_of_session": "2026-10-07",
+  "items": [
+    {
+      "ticker": "SCOM",
+      "name": "Safaricom PLC",
+      "sector": "Telecommunication",
+      "aliases": [],
+      "status": "active",
+      "has_forecast": true,
+      "liquidity_rank": 1,
+      "last": {
+        "close": 35.64,
+        "change_pct": 0.025
+      }
+    },
+    {
+      "ticker": "EQTY",
+      "name": "Equity Group Holdings Plc",
+      "sector": "Banking",
+      "aliases": [],
+      "status": "active",
+      "has_forecast": true,
+      "liquidity_rank": 2,
+      "last": {
+        "close": 25.93,
+        "change_pct": -0.0058
+      }
+    },
+    {
+      "ticker": "KCB",
+      "name": "KCB Group Plc",
+      "sector": "Banking",
+      "aliases": [],
+      "status": "active",
+      "has_forecast": true,
+      "liquidity_rank": 3,
+      "last": {
+        "close": 59.7,
+        "change_pct": 0.003
+      }
+    },
+    {
+      "ticker": "EABL",
+      "name": "East African Breweries PLC",
+      "sector": "Manufacturing and Allied",
+      "aliases": [],
+      "status": "active",
+      "has_forecast": true,
+      "liquidity_rank": 4,
+      "last": {
+        "close": 613.34,
+        "change_pct": -0.0016
+      }
+    },
+    {
+      "ticker": "ABSA",
+      "name": "Absa Bank Kenya PLC",
+      "sector": "Banking",
+      "aliases": [
+        "Barclays Bank of Kenya"
+      ],
+      "status": "active",
+      "has_forecast": true,
+      "liquidity_rank": 5,
+      "last": {
+        "close": 25.44,
+        "change_pct": 0.0063
+      }
+    },
+    {
+      "ticker": "NCBA",
+      "name": "NCBA Group PLC",
+      "sector": "Banking",
+      "aliases": [
+        "NIC Group",
+        "Commercial Bank of Africa"
+      ],
+      "status": "active",
+      "has_forecast": true,
+      "liquidity_rank": 6,
+      "last": {
+        "close": 143.97,
+        "change_pct": -0.0217
+      }
+    },
+    {
+      "ticker": "KUKZ",
+      "name": "Kakuzi Plc",
+      "sector": "Agricultural",
+      "aliases": [],
+      "status": "active",
+      "has_forecast": false,
+      "liquidity_rank": 7,
+      "last": {
+        "close": 586.73,
+        "change_pct": 0.0
+      }
+    },
+    {
+      "ticker": "UCHM",
+      "name": "Uchumi Supermarket Plc",
+      "sector": "Commercial and Services",
+      "aliases": [],
+      "status": "suspended",
+      "has_forecast": false,
+      "liquidity_rank": 8,
+      "last": {
+        "close": 0.3,
+        "change_pct": 0.0
+      }
+    }
+  ]
+}

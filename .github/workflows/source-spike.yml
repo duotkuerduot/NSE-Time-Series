@@ -1,0 +1,75 @@
+# Phase 0 source verification spike (ENGINEERING.md 8.3; review MF-2).
+#
+# Polls each candidate source every 15 minutes in the evening and once the next morning,
+# recording when each session's file first appears. With R2 credentials in the `production`
+# environment, files are archived to the PRIVATE bucket; without them, only metadata is kept
+# (timestamps, status codes, sizes, hashes). Third-party files are never uploaded as workflow
+# artifacts or committed, because that would redistribute them.
+name: source-spike
+
+on:
+  schedule:
+    - cron: "7,22,37,52 17-22 * * 1-5" # every 15 minutes, 17:07-22:52, Monday to Friday
+      timezone: "Africa/Nairobi"
+    - cron: "40 6 * * 2-6" # next-morning check, Tuesday to Saturday
+      timezone: "Africa/Nairobi"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: probe the latest session, or backcheck a date range (archive depth)
+        type: choice
+        options: [probe, backcheck]
+        default: probe
+      from:
+        description: backcheck start (YYYY-MM-DD)
+        required: false
+        default: "2026-01-01"
+      to:
+        description: backcheck end (YYYY-MM-DD; blank means today in Nairobi)
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: source-spike
+  cancel-in-progress: false
+  queue: max # a newer run never cancels a waiting one (review MF-4)
+
+jobs:
+  spike:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: production
+    env:
+      HAS_R2: ${{ secrets.NSEFC_R2_ACCESS_KEY_ID != '' }}
+      NSEFC_R2_ACCOUNT_ID: ${{ secrets.NSEFC_R2_ACCOUNT_ID }}
+      NSEFC_R2_ACCESS_KEY_ID: ${{ secrets.NSEFC_R2_ACCESS_KEY_ID }}
+      NSEFC_R2_SECRET_ACCESS_KEY: ${{ secrets.NSEFC_R2_SECRET_ACCESS_KEY }}
+      MODE: ${{ inputs.mode || 'probe' }}
+      FROM: ${{ inputs.from || '2026-01-01' }}
+      TO: ${{ inputs.to }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+      - name: Observe sources
+        run: |
+          if [ "$HAS_R2" = "true" ]; then ENV=production; STORE=--store; else ENV=ci; STORE=--no-store; fi
+          if [ "$MODE" = "backcheck" ]; then
+            TO="${TO:-$(TZ=Africa/Nairobi date +%F)}"
+            uv run nsefc spike backcheck --env "$ENV" --from "$FROM" --to "$TO" "$STORE"
+          else
+            uv run nsefc spike probe --env "$ENV" "$STORE"
+          fi
+      - name: Keep observation metadata (metadata only, never source files)
+        # always(): observations are saved one by one, so a failed run still has some to keep.
+        if: ${{ always() && env.HAS_R2 != 'true' }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: spike-observations-${{ github.run_id }}
+          path: var/ci/private/spike/observations/
+          retention-days: 90
+          if-no-files-found: ignore

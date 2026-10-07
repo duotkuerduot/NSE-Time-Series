@@ -1,0 +1,4 @@
+# Automated tests: temporary directories, fixtures only, no network (ENGINEERING.md 29.4).
+storage:
+  backend: local
+  local_root: var/ci

@@ -1,0 +1,27 @@
+{
+  "api_version": "1",
+  "release_id": "2026-10-07.903952e",
+  "generated_at": "2026-10-07T15:48:12Z",
+  "latest_session": "2026-10-07",
+  "next_session": "2026-10-08",
+  "stale_after": "2026-10-08T19:00:00Z",
+  "pipeline": {
+    "status": "succeeded",
+    "finished_at": "2026-10-07T15:48:12Z",
+    "primary_source": "nse_pricelist",
+    "fallback_used": false,
+    "dq": "passed"
+  },
+  "champion": {
+    "model_id": "m_20261001_lgbm_7c1e9a",
+    "label": "LightGBM",
+    "version": "2026.10.1"
+  },
+  "notices": [
+    {
+      "code": "FIXTURE",
+      "message": "Fixture data: values are illustrative, not market data.",
+      "severity": "warning"
+    }
+  ]
+}

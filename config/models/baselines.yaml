@@ -1,0 +1,8 @@
+# Baselines are first-class and eligible champions (ENGINEERING.md 15).
+B0: {algorithm: naive}
+B1: {algorithm: drift, window_sessions: 250}
+B2: {algorithm: sma5}
+B3: {algorithm: ar1, window_sessions: 500, fit: lad}   # review MF-6: median fit under MAE
+B4: {algorithm: arima, diagnostic_only: true}
+B5: {algorithm: last_trade, enabled_if_source_has: last_trade_price}   # review MF-6
+microstructure_only: {algorithm: same_as_candidate, features: [ret_1, price_set_flags, market_ret_1, hl_position]}

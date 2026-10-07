@@ -1,0 +1,20 @@
+# Data-quality thresholds (ENGINEERING.md 10.2). Implemented in Phase 1 (core) and Phase 3.
+# The historical profile may relax thresholds only by naming them here (10.6).
+profiles:
+  live:
+    price_band: 0.10                 # Rule 5.10.1; recovery board 0.05 (5.10.2)
+    price_band_tolerance: 0.005      # PRC-03: band + 0.5 percentage points
+    prev_close_tolerance_kes: 0.01   # PRC-04
+    prev_close_batch_error_share: 0.10
+    band_breach_batch_error_share: 0.20   # PRC-06
+    volume_spike_multiple: 50        # VOL-03, trailing 60-session median
+    min_presence_share: 0.95         # MKT-01, counted on source rows only (review MF-3)
+    universe_missing_batch_share: 0.10    # MKT-02
+    index_change_limit: 0.15         # MKT-03
+    cross_source_close_tolerance: 0.005   # MKT-04
+    cross_source_min_agreement: 0.95
+    redated_identical_share: 0.95    # DAT-05
+    unmapped_symbols_batch_error: 3  # SCH-03
+  historical:
+    inherits: live
+    relaxations: {}                  # every relaxation is listed in the audit report

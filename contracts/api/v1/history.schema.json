@@ -1,0 +1,115 @@
+{
+  "$defs": {
+    "PriceEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "date": {
+          "format": "date",
+          "title": "Date",
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "ex_dividend",
+            "bonus",
+            "split",
+            "rights",
+            "suspension",
+            "listing"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        }
+      },
+      "required": [
+        "date",
+        "type",
+        "label"
+      ],
+      "title": "PriceEvent",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Columnar series to keep payloads small (22.3). Prices are as published.",
+  "properties": {
+    "ticker": {
+      "description": "NSE ticker, e.g. SCOM",
+      "pattern": "^[A-Z0-9&.\\-]{2,12}$",
+      "title": "Ticker",
+      "type": "string"
+    },
+    "range": {
+      "enum": [
+        "1y",
+        "max"
+      ],
+      "title": "Range",
+      "type": "string"
+    },
+    "price_basis": {
+      "enum": [
+        "vwap",
+        "last",
+        "unknown"
+      ],
+      "title": "Price Basis",
+      "type": "string"
+    },
+    "dates": {
+      "items": {
+        "format": "date",
+        "type": "string"
+      },
+      "title": "Dates",
+      "type": "array"
+    },
+    "close": {
+      "items": {
+        "description": "Price in Kenya shillings",
+        "exclusiveMinimum": 0,
+        "type": "number"
+      },
+      "title": "Close",
+      "type": "array"
+    },
+    "volume": {
+      "items": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "title": "Volume",
+      "type": "array"
+    },
+    "events": {
+      "items": {
+        "$ref": "#/$defs/PriceEvent"
+      },
+      "title": "Events",
+      "type": "array"
+    }
+  },
+  "required": [
+    "ticker",
+    "range",
+    "price_basis",
+    "dates",
+    "close",
+    "volume",
+    "events"
+  ],
+  "title": "PriceHistory",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nsefc.local/contracts/api/v1/history.schema.json"
+}

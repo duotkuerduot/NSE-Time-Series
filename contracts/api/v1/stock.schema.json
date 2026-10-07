@@ -1,0 +1,203 @@
+{
+  "$defs": {
+    "LatestSession": {
+      "additionalProperties": false,
+      "properties": {
+        "session": {
+          "format": "date",
+          "title": "Session",
+          "type": "string"
+        },
+        "close": {
+          "description": "Price in Kenya shillings",
+          "exclusiveMinimum": 0,
+          "title": "Close",
+          "type": "number"
+        },
+        "prev_close": {
+          "description": "Price in Kenya shillings",
+          "exclusiveMinimum": 0,
+          "title": "Prev Close",
+          "type": "number"
+        },
+        "change": {
+          "title": "Change",
+          "type": "number"
+        },
+        "change_pct": {
+          "description": "A ratio, e.g. 0.0124 for 1.24%",
+          "title": "Change Pct",
+          "type": "number"
+        },
+        "volume": {
+          "minimum": 0,
+          "title": "Volume",
+          "type": "integer"
+        },
+        "turnover": {
+          "anyOf": [
+            {
+              "description": "Kenya shillings",
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Turnover"
+        }
+      },
+      "required": [
+        "session",
+        "close",
+        "prev_close",
+        "change",
+        "change_pct",
+        "volume",
+        "turnover"
+      ],
+      "title": "LatestSession",
+      "type": "object"
+    },
+    "Range52w": {
+      "additionalProperties": false,
+      "properties": {
+        "low": {
+          "description": "Price in Kenya shillings",
+          "exclusiveMinimum": 0,
+          "title": "Low",
+          "type": "number"
+        },
+        "high": {
+          "description": "Price in Kenya shillings",
+          "exclusiveMinimum": 0,
+          "title": "High",
+          "type": "number"
+        }
+      },
+      "required": [
+        "low",
+        "high"
+      ],
+      "title": "Range52w",
+      "type": "object"
+    },
+    "StockFlags": {
+      "additionalProperties": false,
+      "properties": {
+        "suspended": {
+          "title": "Suspended",
+          "type": "boolean"
+        },
+        "corporate_action_today": {
+          "title": "Corporate Action Today",
+          "type": "boolean"
+        },
+        "ex_dividend_today": {
+          "title": "Ex Dividend Today",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "suspended",
+        "corporate_action_today",
+        "ex_dividend_today"
+      ],
+      "title": "StockFlags",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "ticker": {
+      "description": "NSE ticker, e.g. SCOM",
+      "pattern": "^[A-Z0-9&.\\-]{2,12}$",
+      "title": "Ticker",
+      "type": "string"
+    },
+    "name": {
+      "title": "Name",
+      "type": "string"
+    },
+    "sector": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Sector"
+    },
+    "segment": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Segment"
+    },
+    "status": {
+      "enum": [
+        "active",
+        "suspended",
+        "delisted"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "latest": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/LatestSession"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "range_52w": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Range52w"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "price_basis": {
+      "description": "vwap: the official price is the volume-weighted average of the session",
+      "enum": [
+        "vwap",
+        "last",
+        "unknown"
+      ],
+      "title": "Price Basis",
+      "type": "string"
+    },
+    "flags": {
+      "$ref": "#/$defs/StockFlags"
+    }
+  },
+  "required": [
+    "ticker",
+    "name",
+    "sector",
+    "segment",
+    "status",
+    "latest",
+    "range_52w",
+    "price_basis",
+    "flags"
+  ],
+  "title": "StockDetail",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nsefc.local/contracts/api/v1/stock.schema.json"
+}

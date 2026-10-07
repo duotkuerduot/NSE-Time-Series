@@ -1,0 +1,4 @@
+# Local work: SQLite and a local directory acting as the object store, under ./var/.
+storage:
+  backend: local
+  local_root: var

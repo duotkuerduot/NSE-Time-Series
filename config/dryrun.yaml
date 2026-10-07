@@ -1,0 +1,4 @@
+# Real data, no side effects: reads production state, writes only to the scratch bucket.
+storage:
+  backend: r2
+  read_only: true

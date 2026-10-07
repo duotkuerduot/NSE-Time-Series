@@ -1,0 +1,351 @@
+{
+  "$defs": {
+    "Breadth": {
+      "additionalProperties": false,
+      "properties": {
+        "dates": {
+          "items": {
+            "format": "date",
+            "type": "string"
+          },
+          "title": "Dates",
+          "type": "array"
+        },
+        "advancers": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Advancers",
+          "type": "array"
+        },
+        "decliners": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Decliners",
+          "type": "array"
+        },
+        "unchanged": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Unchanged",
+          "type": "array"
+        }
+      },
+      "required": [
+        "dates",
+        "advancers",
+        "decliners",
+        "unchanged"
+      ],
+      "title": "Breadth",
+      "type": "object"
+    },
+    "IndexSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "level": {
+          "exclusiveMinimum": 0,
+          "title": "Level",
+          "type": "number"
+        },
+        "change_pct": {
+          "description": "A ratio, e.g. 0.0124 for 1.24%",
+          "title": "Change Pct",
+          "type": "number"
+        }
+      },
+      "required": [
+        "level",
+        "change_pct"
+      ],
+      "title": "IndexSummary",
+      "type": "object"
+    },
+    "IndexTrend": {
+      "additionalProperties": false,
+      "properties": {
+        "index": {
+          "title": "Index",
+          "type": "string"
+        },
+        "dates": {
+          "items": {
+            "format": "date",
+            "type": "string"
+          },
+          "title": "Dates",
+          "type": "array"
+        },
+        "level": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Level",
+          "type": "array"
+        }
+      },
+      "required": [
+        "index",
+        "dates",
+        "level"
+      ],
+      "title": "IndexTrend",
+      "type": "object"
+    },
+    "MarketCharts": {
+      "additionalProperties": false,
+      "properties": {
+        "index_trend": {
+          "$ref": "#/$defs/IndexTrend"
+        },
+        "breadth": {
+          "$ref": "#/$defs/Breadth"
+        },
+        "track_record": {
+          "$ref": "#/$defs/TrackRecordSeries"
+        }
+      },
+      "required": [
+        "index_trend",
+        "breadth",
+        "track_record"
+      ],
+      "title": "MarketCharts",
+      "type": "object"
+    },
+    "MarketSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "nasi": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/IndexSummary"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "nse20": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/IndexSummary"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "advancers": {
+          "minimum": 0,
+          "title": "Advancers",
+          "type": "integer"
+        },
+        "decliners": {
+          "minimum": 0,
+          "title": "Decliners",
+          "type": "integer"
+        },
+        "unchanged": {
+          "minimum": 0,
+          "title": "Unchanged",
+          "type": "integer"
+        },
+        "turnover_kes": {
+          "description": "Kenya shillings",
+          "minimum": 0,
+          "title": "Turnover Kes",
+          "type": "number"
+        },
+        "turnover_vs_20d": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Total market turnover over its 20-session average; block trades included",
+          "title": "Turnover Vs 20D"
+        }
+      },
+      "required": [
+        "nasi",
+        "nse20",
+        "advancers",
+        "decliners",
+        "unchanged",
+        "turnover_kes",
+        "turnover_vs_20d"
+      ],
+      "title": "MarketSummary",
+      "type": "object"
+    },
+    "Mover": {
+      "additionalProperties": false,
+      "properties": {
+        "ticker": {
+          "description": "NSE ticker, e.g. SCOM",
+          "pattern": "^[A-Z0-9&.\\-]{2,12}$",
+          "title": "Ticker",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "close": {
+          "description": "Price in Kenya shillings",
+          "exclusiveMinimum": 0,
+          "title": "Close",
+          "type": "number"
+        },
+        "change_pct": {
+          "description": "A ratio, e.g. 0.0124 for 1.24%",
+          "title": "Change Pct",
+          "type": "number"
+        }
+      },
+      "required": [
+        "ticker",
+        "name",
+        "close",
+        "change_pct"
+      ],
+      "title": "Mover",
+      "type": "object"
+    },
+    "Movers": {
+      "additionalProperties": false,
+      "properties": {
+        "min_turnover_kes": {
+          "description": "Kenya shillings",
+          "minimum": 0,
+          "title": "Min Turnover Kes",
+          "type": "number"
+        },
+        "gainers": {
+          "items": {
+            "$ref": "#/$defs/Mover"
+          },
+          "title": "Gainers",
+          "type": "array"
+        },
+        "losers": {
+          "items": {
+            "$ref": "#/$defs/Mover"
+          },
+          "title": "Losers",
+          "type": "array"
+        }
+      },
+      "required": [
+        "min_turnover_kes",
+        "gainers",
+        "losers"
+      ],
+      "title": "Movers",
+      "type": "object"
+    },
+    "TrackRecordSeries": {
+      "additionalProperties": false,
+      "description": "Rolling 60-session record of forecasts as published (review FE-4).",
+      "properties": {
+        "dates": {
+          "items": {
+            "format": "date",
+            "type": "string"
+          },
+          "title": "Dates",
+          "type": "array"
+        },
+        "model_mae_pct_60": {
+          "items": {
+            "description": "An average absolute error, e.g. 0.0124",
+            "minimum": 0,
+            "type": "number"
+          },
+          "title": "Model Mae Pct 60",
+          "type": "array"
+        },
+        "naive_mae_pct_60": {
+          "items": {
+            "description": "An average absolute error, e.g. 0.0124",
+            "minimum": 0,
+            "type": "number"
+          },
+          "title": "Naive Mae Pct 60",
+          "type": "array"
+        },
+        "coverage_60": {
+          "items": {
+            "description": "A share of cases, e.g. 0.8 for 80%",
+            "maximum": 1,
+            "minimum": 0,
+            "type": "number"
+          },
+          "title": "Coverage 60",
+          "type": "array"
+        },
+        "basis": {
+          "items": {
+            "enum": [
+              "backtest",
+              "live"
+            ],
+            "type": "string"
+          },
+          "title": "Basis",
+          "type": "array"
+        },
+        "model_label": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Model Label",
+          "type": "array"
+        }
+      },
+      "required": [
+        "dates",
+        "model_mae_pct_60",
+        "naive_mae_pct_60",
+        "coverage_60",
+        "basis",
+        "model_label"
+      ],
+      "title": "TrackRecordSeries",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "session": {
+      "format": "date",
+      "title": "Session",
+      "type": "string"
+    },
+    "summary": {
+      "$ref": "#/$defs/MarketSummary"
+    },
+    "movers": {
+      "$ref": "#/$defs/Movers"
+    },
+    "charts": {
+      "$ref": "#/$defs/MarketCharts"
+    }
+  },
+  "required": [
+    "session",
+    "summary",
+    "movers",
+    "charts"
+  ],
+  "title": "MarketOverview",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nsefc.local/contracts/api/v1/overview.schema.json"
+}

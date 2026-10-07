@@ -1,0 +1,12 @@
+# Forecast universe, evaluated point-in-time each month (ENGINEERING.md 13.1).
+# Thresholds are starting points, calibrated in Phase 5 to give roughly 20-30 names.
+instrument_types: [ordinary_share]
+window_sessions: 250
+entry:
+  min_price_set_share: 0.80        # sessions with >= 100 shares traded (rule 7.6.6; review D-5)
+  min_median_turnover_kes: 1000000
+  min_history_sessions: 500
+exit:
+  min_price_set_share: 0.70
+  min_median_turnover_kes: 500000
+exclude_suspended: true

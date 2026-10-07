@@ -1,0 +1,8 @@
+# M3 CatBoost (ENGINEERING.md 16.4).
+loss: [MAE, Huber, RMSE]
+depth: {low: 3, high: 6}
+learning_rate: {low: 0.01, high: 0.1, log: true}
+l2_leaf_reg: {low: 1, high: 30}
+max_iterations: 2000
+fixed: {random_seed: 20261007, thread_count: 4}
+tuning: {sampler: tpe, trials: 40, seed: 20261007}

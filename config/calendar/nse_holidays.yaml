@@ -1,0 +1,105 @@
+# NSE trading calendar: source of truth for which weekdays are sessions (ENGINEERING.md 7.5).
+#
+# Status values
+#   rule         fixed-date or Easter-based statutory holiday
+#   confirmed    NSE trading data shows no trading that day (repository "NSE Data", 2007-2025)
+#   listed       on published 2024-2026 holiday lists, not yet checked against trading data
+#   provisional  expected but not yet gazetted (moon-dependent) or not verifiable (no data)
+#
+# Every change goes through a reviewed pull request. Weekday gaps in the trading data that
+# no entry explains are listed in reports/calendar-reconciliation.md for the Phase 1 audit;
+# they are deliberately NOT entered here until someone finds the reason.
+version: 1
+timezone: Africa/Nairobi
+coverage:
+  start: 2005-01-01
+  end: 2026-12-31   # extend with next year's moon-dependent dates before December
+
+# A holiday falling on a Sunday is observed on the next weekday that is not itself a holiday.
+# Confirmed in the data: Christmas on Sunday 2016-12-25 and 2022-12-25 closed both the 26th
+# and the 27th; Boxing Day on Sunday 2021-12-26 closed Monday the 27th. Saturdays do not move.
+# December 2010 and 2011 are exceptions: the market traded (see held_sessions below).
+sunday_rule: next_free_weekday
+
+fixed:
+  - {name: "New Year's Day", month: 1, day: 1}
+  - {name: Labour Day, month: 5, day: 1}
+  - {name: Madaraka Day, month: 6, day: 1}
+  - {name: Moi Day, month: 10, day: 10, until: 2009,
+     source: "NSE data: no trading 2007-10-10 and 2008-10-10"}
+  - {name: Moi Day, month: 10, day: 10, since: 2018, until: 2019,
+     source: "NSE data: no trading 2018-10-10 and 2019-10-10; not observed 2010-2017"}
+  - {name: Utamaduni Day, month: 10, day: 10, since: 2020, until: 2023,
+     source: "NSE data: no trading 2021-10-11 (Sunday rule), 2022-10-10, 2023-10-10; name approximate"}
+  - {name: Mazingira Day, month: 10, day: 10, since: 2024,
+     source: "NSE data 2024-10-10, 2025-10-10; officeholidays.com 2024-2026"}
+  - {name: Kenyatta Day, month: 10, day: 20, until: 2009}
+  - {name: Mashujaa Day, month: 10, day: 20, since: 2010}
+  - {name: Jamhuri Day, month: 12, day: 12}
+  - {name: Christmas Day, month: 12, day: 25}
+  - {name: Boxing Day, month: 12, day: 26}
+
+easter:
+  - {name: Good Friday, offset_days: -2}
+  - {name: Easter Monday, offset_days: 1}
+
+# Moon-dependent holidays, recorded on the weekday the market was (or will be) closed.
+dated:
+  - {date: 2005-11-03, name: Idd-ul-Fitr, status: provisional, source: "approximate; no trading data before 2007"}
+  - {date: 2006-10-24, name: Idd-ul-Fitr, status: provisional, source: "approximate; no trading data before 2007"}
+  - {date: 2008-10-01, name: Idd-ul-Fitr, status: confirmed, source: "NSE data"}
+  - {date: 2009-09-21, name: Idd-ul-Fitr, status: confirmed, source: "NSE data; Idd fell on Sunday 20 Sep"}
+  - {date: 2011-08-31, name: Idd-ul-Fitr, status: confirmed, source: "NSE data"}
+  - {date: 2012-08-20, name: Idd-ul-Fitr, status: confirmed, source: "NSE data; Idd fell on Sunday 19 Aug"}
+  - {date: 2013-08-09, name: Idd-ul-Fitr, status: confirmed, source: "NSE data"}
+  - {date: 2014-07-29, name: Idd-ul-Fitr, status: confirmed, source: "NSE data"}
+  - {date: 2016-07-07, name: Idd-ul-Fitr, status: confirmed, source: "NSE data"}
+  - {date: 2017-06-26, name: Idd-ul-Fitr, status: confirmed, source: "NSE data"}
+  - {date: 2018-06-15, name: Idd-ul-Fitr, status: confirmed, source: "NSE data"}
+  - {date: 2019-06-05, name: Idd-ul-Fitr, status: confirmed, source: "NSE data"}
+  - {date: 2020-05-25, name: Idd-ul-Fitr, status: confirmed, source: "NSE data; Idd fell on Sunday 24 May"}
+  - {date: 2021-05-14, name: Idd-ul-Fitr, status: confirmed, source: "NSE data"}
+  - {date: 2022-05-03, name: Idd-ul-Fitr, status: confirmed, source: "NSE data"}
+  - {date: 2023-04-21, name: Idd-ul-Fitr, status: confirmed, source: "NSE data"}
+  - {date: 2024-04-10, name: Idd-ul-Fitr, status: confirmed, source: "NSE data; officeholidays.com"}
+  - {date: 2025-03-31, name: Idd-ul-Fitr, status: confirmed, source: "NSE data; officeholidays.com"}
+  - {date: 2026-03-20, name: Idd-ul-Fitr, status: listed, source: "officeholidays.com 2026"}
+  - {date: 2016-09-12, name: Idd-ul-Azha, status: confirmed, source: "NSE data"}
+  - {date: 2018-08-21, name: Idd-ul-Azha, status: confirmed, source: "NSE data"}
+  - {date: 2019-08-12, name: Idd-ul-Azha, status: confirmed, source: "NSE data"}
+  - {date: 2020-07-31, name: Idd-ul-Azha, status: provisional, source: "expected (a holiday in 2016 and 2018-2025); no trading data for Jul-Dec 2020"}
+  - {date: 2021-07-20, name: Idd-ul-Azha, status: confirmed, source: "NSE data"}
+  - {date: 2022-07-11, name: Idd-ul-Azha, status: confirmed, source: "NSE data; Idd fell on Sunday 10 Jul"}
+  - {date: 2023-06-28, name: Idd-ul-Azha, status: confirmed, source: "NSE data"}
+  - {date: 2024-06-17, name: Idd-ul-Azha, status: confirmed, source: "NSE data; Idd fell on Sunday 16 Jun"}
+  - {date: 2025-06-06, name: Idd-ul-Azha, status: confirmed, source: "NSE data; officeholidays.com"}
+  - {date: 2026-05-27, name: Idd-ul-Azha, status: listed, source: "officeholidays.com 2026"}
+
+# One-off gazetted closures. Reasons come from public reporting; the date is what matters.
+closures:
+  - {date: 2005-11-21, name: Constitutional referendum, status: provisional, source: "declared a public holiday; no trading data before 2007"}
+  - {date: 2007-12-27, name: General election, status: confirmed, source: "NSE data"}
+  - {date: 2008-11-06, name: Special public holiday (US presidential election result), status: confirmed, source: "NSE data"}
+  - {date: 2010-08-04, name: Constitutional referendum, status: confirmed, source: "NSE data"}
+  - {date: 2010-08-27, name: Promulgation of the Constitution, status: confirmed, source: "NSE data"}
+  - {date: 2013-03-04, name: General election, status: confirmed, source: "NSE data"}
+  - {date: 2013-04-09, name: Presidential inauguration, status: confirmed, source: "NSE data"}
+  - {date: 2015-11-26, name: Papal visit, status: confirmed, source: "NSE data"}
+  - {date: 2017-08-08, name: General election, status: confirmed, source: "NSE data"}
+  - {date: 2017-10-26, name: Fresh presidential election, status: confirmed, source: "NSE data"}
+  - {date: 2017-11-28, name: Presidential inauguration, status: confirmed, source: "NSE data"}
+  - {date: 2020-02-11, name: National mourning (former President Moi), status: confirmed, source: "NSE data"}
+  - {date: 2022-04-29, name: National mourning (former President Kibaki), status: confirmed, source: "NSE data"}
+  - {date: 2022-08-09, name: General election, status: confirmed, source: "NSE data; ENGINEERING.md 7.5"}
+  - {date: 2022-09-13, name: Presidential inauguration, status: confirmed, source: "NSE data"}
+  - {date: 2023-11-13, name: National Tree Growing Day, status: confirmed, source: "NSE data"}
+  - {date: 2024-05-10, name: National Tree Growing Day, status: confirmed, source: "NSE data; officeholidays.com"}
+  - {date: 2024-11-01, name: Special public holiday, status: confirmed, source: "NSE data; officeholidays.com (reason to verify)"}
+  - {date: 2025-10-17, name: Special public holiday (national mourning), status: confirmed, source: "NSE data; officeholidays.com (verify gazette notice)"}
+
+# Weekdays the rules above would close but on which the market traded: for history the data
+# wins (ENGINEERING.md 7.5). Each was a full session (about 57 to 59 securities quoted and
+# 36 to 42 traded, like the days around it).
+held_sessions:
+  - {date: 2010-12-27, status: confirmed, source: "NSE data: Boxing Day on Sunday 26 Dec 2010 was not moved to Monday"}
+  - {date: 2011-12-27, status: confirmed, source: "NSE data: Christmas on Sunday 25 Dec 2011 did not cascade past Boxing Day (Monday 26)"}

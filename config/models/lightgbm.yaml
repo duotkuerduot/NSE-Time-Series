@@ -1,0 +1,14 @@
+# M2 LightGBM (ENGINEERING.md 16.4). Determinism: deterministic=true, force_col_wise=true,
+# fixed num_threads; results still differ across machines (review ML-6), so reproducibility
+# is checked on predictions within tolerance, not byte-identical artifacts.
+objective: [l1, huber, l2]
+learning_rate: {low: 0.01, high: 0.1, log: true}
+num_leaves: {low: 7, high: 63}
+min_data_in_leaf: {low: 100, high: 2000}
+feature_fraction: {low: 0.5, high: 0.9}
+bagging_fraction: {low: 0.5, high: 0.9}
+lambda_l2: {low: 0, high: 10}
+max_trees: 2000
+early_stopping_tail_share: 0.10
+fixed: {deterministic: true, force_col_wise: true, num_threads: 4}
+tuning: {sampler: tpe, trials: 40, seed: 20261007}

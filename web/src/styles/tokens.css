@@ -1,0 +1,30 @@
+/* Visual tokens (ENGINEERING.md 24.8). Colour carries meaning only: green and red for actual
+   price changes, blue for model output, ink for actual prices and text. */
+:root {
+  --bg: #ffffff;
+  --surface: #f4f6f5;
+  --ink: #15201c;
+  --ink-2: #4a5752;
+  --gain: #0f7a3d;
+  --loss: #b3261e;
+  --model: #2d4cb0;
+  --rule: #8a9590; /* decorative only: below 3:1 on --surface (review) */
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #101a17;
+    --surface: #17241f;
+    --ink: #e8eeeb;
+    --ink-2: #a7b4ae;
+    --gain: #5bd38a;
+    --loss: #ff8a80;
+    --model: #9db3ff;
+    --rule: #5e6b66;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}

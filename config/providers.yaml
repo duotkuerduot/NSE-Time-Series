@@ -1,0 +1,83 @@
+# Provider registry (ENGINEERING.md 8.2, 9.1). Facts below were checked on 7 Oct 2026; see
+# docs/sources/source-evaluation.md for evidence. URL templates use {YYYY} {YY} {MM} {DD}
+# {Mon} (Oct) and {MON} (OCT) for the session date being fetched, and {UPLOAD_YYYY}
+# {UPLOAD_MM} for a WordPress upload folder, which names the month the file was uploaded:
+# the spike also tries the next month's folder for sessions in the last week of a month.
+providers:
+  registry:
+    - provider_id: nse_pricelist
+      name: NSE daily equity price list
+      role: primary_candidate
+      price_basis: vwap
+      format: pdf
+      url_template: "https://www.nse.co.ke/dataservices/wp-content/uploads/{DD}-{MON}-{YY}.pdf"
+      fields: [day_low, day_high, day_price, previous, volume]
+      terms_url: https://www.nse.co.ke/dataservices/market-data-policy/
+      notes: >-
+        Official source. Free download at a date-patterned URL. Text extraction failed in a
+        quick check, so confirm the parser does not need OCR. Display and derived use fall
+        under the NSE Market Data Policies (v6/2026).
+
+    - provider_id: kingdom
+      name: Kingdom Securities Daily Market Wrap
+      role: validator_candidate
+      price_basis: vwap
+      format: pdf
+      url_template: "https://kingdomsecurities.co.ke/wp-content/uploads/{UPLOAD_YYYY}/{UPLOAD_MM}/Daily-Market-Wrap-{DD}-{Mon}-{YYYY}.pdf"
+      fields: [previous, day_price, change_pct, turnover_kes_mn]
+      terms_url: https://kingdomsecurities.co.ke/research/
+      notes: >-
+        Company names, not tickers. No volume, high, low or deals, so it cannot fill a
+        canonical bar alone (review D-1). Header row contains the session dates, which
+        layout fingerprints must strip (D-2). The 7 Oct 2026 edition was online by 20:08 EAT.
+
+    - provider_id: kenyastocks
+      name: KenyaStocks (kenyastocks.co.ke)
+      role: excluded
+      price_basis: unknown
+      format: html
+      terms_url: https://kenyastocks.co.ke/legal/terms
+      spike: false
+      notes: >-
+        Re-publisher built from Kingdom wraps, a broker volume report and Mansa Markets
+        (credited with last-traded prices from 11 Sep 2026). Terms forbid republishing price
+        tables at scale. Not independent of Kingdom (review D-3).
+
+    - provider_id: afx
+      name: AFX market data (afx.kwayisi.org/nse)
+      role: excluded
+      price_basis: unknown
+      format: html
+      spike: false
+      notes: Page served on 7 Oct 2026 showed a trading summary dated 20 Nov 2024; appears stale.
+
+    - provider_id: mystocks
+      name: myStocks (licensed NSE data vendor)
+      role: backfill_candidate
+      price_basis: vwap
+      format: html
+      terms_url: https://live.mystocks.co.ke/terms.php
+      spike: false
+      notes: >-
+        20+ years of history for subscribers. Redistribution needs the vendor's written
+        consent. Candidate for a licensed 2026 backfill, never a scraping target.
+
+    - provider_id: aib_axys
+      name: AIB-AXYS Africa Daily Market Watch
+      role: validator_candidate
+      price_basis: unknown
+      format: pdf
+      terms_url: https://www.aib-axysafrica.com/research
+      spike: false
+      notes: Possible volume source (KenyaStocks used it Jul-Sep 2026). URL pattern not yet known.
+
+    - provider_id: historical_file
+      name: NSE All Stocks Prices dataset (Mendeley Data, CC BY 4.0)
+      role: backfill_candidate
+      price_basis: vwap
+      format: csv
+      fields: [day_low, day_high, day_price, previous, change, change_pct, volume, adjusted_price]
+      spike: false
+      notes: >-
+        The repository's "NSE Data" folder. Covers 2007-01-02 to 2025-10-31, with no data
+        for Jul-Dec 2020 and nothing after Oct 2025. See reports/historical-data-coverage.md.

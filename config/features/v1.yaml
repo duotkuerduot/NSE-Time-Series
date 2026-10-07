@@ -1,0 +1,15 @@
+# Feature specification v1 (ENGINEERING.md 12). Families enter production only after the
+# Stage A evaluation in 12.3. Implemented in Phase 4.
+version: 1
+status: draft
+families:
+  R: {features: [ret_1, ret_2, ret_3, ret_5, ret_10, ret_20, ret_60], status: core}
+  V: {features: [vol_5, vol_20, vol_60, ewma_vol, hl_range, atr_14, parkinson_20], status: core,
+      notes: "EWMA truncated at 250 sessions so values do not depend on where the panel starts (review ML-5)"}
+  L: {features: [log_volume, volume_vs_median_20, log_turnover, price_set_share_20, sessions_since_price_set, amihud_20], status: core}
+  T: {status: candidate}
+  P: {status: candidate, notes: "only if high and low are reliably published"}
+  C: {status: candidate}
+  X: {status: candidate, notes: "include lagged market return x staleness interactions (review ML-1)"}
+  S: {status: candidate}
+  XS: {status: candidate}

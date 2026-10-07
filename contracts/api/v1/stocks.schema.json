@@ -1,0 +1,132 @@
+{
+  "$defs": {
+    "LastPrice": {
+      "additionalProperties": false,
+      "properties": {
+        "close": {
+          "description": "Price in Kenya shillings",
+          "exclusiveMinimum": 0,
+          "title": "Close",
+          "type": "number"
+        },
+        "change_pct": {
+          "description": "A ratio, e.g. 0.0124 for 1.24%",
+          "title": "Change Pct",
+          "type": "number"
+        }
+      },
+      "required": [
+        "close",
+        "change_pct"
+      ],
+      "title": "LastPrice",
+      "type": "object"
+    },
+    "StockIndexItem": {
+      "additionalProperties": false,
+      "properties": {
+        "ticker": {
+          "description": "NSE ticker, e.g. SCOM",
+          "pattern": "^[A-Z0-9&.\\-]{2,12}$",
+          "title": "Ticker",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "sector": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Sector"
+        },
+        "aliases": {
+          "description": "Former names and tickers",
+          "items": {
+            "type": "string"
+          },
+          "title": "Aliases",
+          "type": "array"
+        },
+        "status": {
+          "enum": [
+            "active",
+            "suspended",
+            "delisted"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "has_forecast": {
+          "title": "Has Forecast",
+          "type": "boolean"
+        },
+        "liquidity_rank": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "1 = most liquid; breaks search ties (24.3)",
+          "title": "Liquidity Rank"
+        },
+        "last": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/LastPrice"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "ticker",
+        "name",
+        "sector",
+        "aliases",
+        "status",
+        "has_forecast",
+        "liquidity_rank",
+        "last"
+      ],
+      "title": "StockIndexItem",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "as_of_session": {
+      "format": "date",
+      "title": "As Of Session",
+      "type": "string"
+    },
+    "items": {
+      "items": {
+        "$ref": "#/$defs/StockIndexItem"
+      },
+      "title": "Items",
+      "type": "array"
+    }
+  },
+  "required": [
+    "as_of_session",
+    "items"
+  ],
+  "title": "StocksIndex",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nsefc.local/contracts/api/v1/stocks.schema.json"
+}

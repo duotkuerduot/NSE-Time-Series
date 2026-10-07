@@ -1,0 +1,5 @@
+# Production model pointer (ENGINEERING.md 20.2). Git is the source of truth for which model
+# is live; changes only through a reviewed pull request (28.4). No champion before Phase 8.
+champion: null
+artifact_sha256: null
+previous_champion: null

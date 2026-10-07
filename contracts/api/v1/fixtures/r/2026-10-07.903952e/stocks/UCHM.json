@@ -1,0 +1,26 @@
+{
+  "ticker": "UCHM",
+  "name": "Uchumi Supermarket Plc",
+  "sector": "Commercial and Services",
+  "segment": "Main Investment Market Segment",
+  "status": "suspended",
+  "latest": {
+    "session": "2026-08-05",
+    "close": 0.3,
+    "prev_close": 0.3,
+    "change": 0.0,
+    "change_pct": 0.0,
+    "volume": 0,
+    "turnover": 0.0
+  },
+  "range_52w": {
+    "low": 0.3,
+    "high": 0.3
+  },
+  "price_basis": "vwap",
+  "flags": {
+    "suspended": true,
+    "corporate_action_today": false,
+    "ex_dividend_today": false
+  }
+}

@@ -1,0 +1,41 @@
+# Shared defaults. Environment files (development, ci, dryrun, production) override these,
+# then NSEFC__SECTION__KEY environment variables, then CLI flags (ENGINEERING.md 33.2).
+
+storage:
+  backend: local
+  local_root: var
+  private_bucket: nsefc-data
+  public_bucket: nsefc-public
+  scratch_bucket: nsefc-scratch
+  public_base_url: http://localhost:5173/api/v1
+  read_only: false
+
+providers:
+  # The live chain is decided by the Phase 0 source spike and recorded in ADR-003.
+  # Empty until then: nothing ingests live data before Phase 2.
+  chain: []
+  politeness:
+    user_agent: "nsefc/0.1 (+https://github.com/duotkuerduot/NSE-Time-Series)"
+    min_seconds_between_requests: 1.0
+    timeout_seconds: 30
+    retries: 3
+
+calendar:
+  holidays_file: config/calendar/nse_holidays.yaml
+  coverage_warning_days: 60
+
+pipeline:
+  freshness_deadline_eat: "22:00"
+  # Pre-trading opens at 08:45 (NSE Equity Trading Rules 6.1.3); forecasts after this are late.
+  preopen_cutoff_eat: "08:45"
+
+refit:
+  schedule: monthly
+
+publishing:
+  releases_retained: 30
+  movers_min_turnover_kes: 100000
+  movers_count: 5
+
+spike:
+  store_files: true

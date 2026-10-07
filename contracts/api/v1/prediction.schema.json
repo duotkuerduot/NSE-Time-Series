@@ -1,0 +1,378 @@
+{
+  "$defs": {
+    "DirectionOutcome": {
+      "enum": [
+        "hit",
+        "miss",
+        "no_change"
+      ],
+      "title": "DirectionOutcome",
+      "type": "string"
+    },
+    "ForecastLatest": {
+      "additionalProperties": false,
+      "properties": {
+        "origin_session": {
+          "format": "date",
+          "title": "Origin Session",
+          "type": "string"
+        },
+        "target_session": {
+          "format": "date",
+          "title": "Target Session",
+          "type": "string"
+        },
+        "last_close": {
+          "description": "Price in Kenya shillings",
+          "exclusiveMinimum": 0,
+          "title": "Last Close",
+          "type": "number"
+        },
+        "predicted_close": {
+          "description": "Price in Kenya shillings",
+          "exclusiveMinimum": 0,
+          "title": "Predicted Close",
+          "type": "number"
+        },
+        "predicted_return": {
+          "description": "May be rounded to 4 decimal places",
+          "title": "Predicted Return",
+          "type": "number"
+        },
+        "range": {
+          "$ref": "#/$defs/ForecastRange"
+        },
+        "model": {
+          "$ref": "#/$defs/ModelRef"
+        },
+        "generated_at": {
+          "description": "ISO 8601 with offset, e.g. ...Z",
+          "format": "date-time",
+          "title": "Generated At",
+          "type": "string"
+        },
+        "data_through": {
+          "format": "date",
+          "title": "Data Through",
+          "type": "string"
+        },
+        "is_late": {
+          "title": "Is Late",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "origin_session",
+        "target_session",
+        "last_close",
+        "predicted_close",
+        "predicted_return",
+        "range",
+        "model",
+        "generated_at",
+        "data_through",
+        "is_late"
+      ],
+      "title": "ForecastLatest",
+      "type": "object"
+    },
+    "ForecastRange": {
+      "additionalProperties": false,
+      "properties": {
+        "level": {
+          "default": 0.8,
+          "description": "Always the 80% range in v1",
+          "maximum": 0.8,
+          "minimum": 0.8,
+          "title": "Level",
+          "type": "number"
+        },
+        "lower": {
+          "description": "Price in Kenya shillings",
+          "exclusiveMinimum": 0,
+          "title": "Lower",
+          "type": "number"
+        },
+        "upper": {
+          "description": "Price in Kenya shillings",
+          "exclusiveMinimum": 0,
+          "title": "Upper",
+          "type": "number"
+        }
+      },
+      "required": [
+        "level",
+        "lower",
+        "upper"
+      ],
+      "title": "ForecastRange",
+      "type": "object"
+    },
+    "ModelRef": {
+      "additionalProperties": false,
+      "properties": {
+        "model_id": {
+          "title": "Model Id",
+          "type": "string"
+        },
+        "label": {
+          "description": "Display name, e.g. 'LightGBM' or 'No-change baseline'",
+          "title": "Label",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "model_id",
+        "label",
+        "version"
+      ],
+      "title": "ModelRef",
+      "type": "object"
+    },
+    "PredictionHistoryRow": {
+      "additionalProperties": false,
+      "properties": {
+        "origin_session": {
+          "format": "date",
+          "title": "Origin Session",
+          "type": "string"
+        },
+        "target_session": {
+          "format": "date",
+          "title": "Target Session",
+          "type": "string"
+        },
+        "predicted_close": {
+          "description": "Price in Kenya shillings",
+          "exclusiveMinimum": 0,
+          "title": "Predicted Close",
+          "type": "number"
+        },
+        "lower": {
+          "description": "Price in Kenya shillings",
+          "exclusiveMinimum": 0,
+          "title": "Lower",
+          "type": "number"
+        },
+        "upper": {
+          "description": "Price in Kenya shillings",
+          "exclusiveMinimum": 0,
+          "title": "Upper",
+          "type": "number"
+        },
+        "actual_close": {
+          "anyOf": [
+            {
+              "description": "Price in Kenya shillings",
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Actual Close"
+        },
+        "error_pct": {
+          "anyOf": [
+            {
+              "description": "A ratio, e.g. 0.0124 for 1.24%",
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Error Pct"
+        },
+        "direction": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DirectionOutcome"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "in_range": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "In Range"
+        },
+        "model_id": {
+          "description": "The model that made this forecast (review FE-4)",
+          "title": "Model Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "origin_session",
+        "target_session",
+        "predicted_close",
+        "lower",
+        "upper",
+        "actual_close",
+        "error_pct",
+        "direction",
+        "in_range",
+        "model_id"
+      ],
+      "title": "PredictionHistoryRow",
+      "type": "object"
+    },
+    "TrackRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "basis": {
+          "enum": [
+            "live",
+            "backtest"
+          ],
+          "title": "Basis",
+          "type": "string"
+        },
+        "window_sessions": {
+          "minimum": 1,
+          "title": "Window Sessions",
+          "type": "integer"
+        },
+        "n": {
+          "minimum": 0,
+          "title": "N",
+          "type": "integer"
+        },
+        "mae_pct": {
+          "description": "An average absolute error, e.g. 0.0124",
+          "minimum": 0,
+          "title": "Mae Pct",
+          "type": "number"
+        },
+        "naive_mae_pct": {
+          "description": "An average absolute error, e.g. 0.0124",
+          "minimum": 0,
+          "title": "Naive Mae Pct",
+          "type": "number"
+        },
+        "range_coverage": {
+          "description": "A share of cases, e.g. 0.8 for 80%",
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Range Coverage",
+          "type": "number"
+        },
+        "directional_accuracy": {
+          "anyOf": [
+            {
+              "description": "A share of cases, e.g. 0.8 for 80%",
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Directional Accuracy"
+        },
+        "directional_n": {
+          "minimum": 0,
+          "title": "Directional N",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "basis",
+        "window_sessions",
+        "n",
+        "mae_pct",
+        "naive_mae_pct",
+        "range_coverage",
+        "directional_accuracy",
+        "directional_n"
+      ],
+      "title": "TrackRecord",
+      "type": "object"
+    },
+    "UnavailableReason": {
+      "description": "Why a security has no forecast in a release (ENGINEERING.md 22.3).",
+      "enum": [
+        "NOT_IN_FORECAST_UNIVERSE",
+        "INSUFFICIENT_HISTORY",
+        "SUSPENDED",
+        "DATA_QUALITY_HOLD",
+        "PIPELINE_DELAYED",
+        "MODEL_UNAVAILABLE"
+      ],
+      "title": "UnavailableReason",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "ticker": {
+      "description": "NSE ticker, e.g. SCOM",
+      "pattern": "^[A-Z0-9&.\\-]{2,12}$",
+      "title": "Ticker",
+      "type": "string"
+    },
+    "latest": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ForecastLatest"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "unavailable_reason": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/UnavailableReason"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "track_record": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/TrackRecord"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "history": {
+      "items": {
+        "$ref": "#/$defs/PredictionHistoryRow"
+      },
+      "title": "History",
+      "type": "array"
+    }
+  },
+  "required": [
+    "ticker",
+    "latest",
+    "unavailable_reason",
+    "track_record",
+    "history"
+  ],
+  "title": "StockPrediction",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nsefc.local/contracts/api/v1/prediction.schema.json"
+}

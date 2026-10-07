@@ -1,0 +1,31 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 var(--font); }
+body { font-variant-numeric: tabular-nums; }
+a { color: inherit; }
+a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid var(--model); outline-offset: 2px; }
+.shell { max-width: 1120px; margin: 0 auto; padding: 0 var(--s4); }
+header.site { display: flex; flex-wrap: wrap; gap: var(--s3); justify-content: space-between; align-items: baseline; padding: var(--s4) 0; border-bottom: 1px solid var(--rule); }
+.wordmark { font-weight: 600; font-size: 17px; text-decoration: none; }
+.meta { color: var(--ink-2); font-size: 13px; }
+.banner { background: var(--surface); padding: var(--s3) var(--s4); margin: var(--s4) 0; border-left: 4px solid var(--loss); }
+section { padding: var(--s5) 0; border-bottom: 1px solid var(--rule); }
+h1 { font-size: 26px; font-weight: 600; margin: 0 0 var(--s2); }
+h2 { font-size: 17px; font-weight: 600; margin: 0 0 var(--s3); }
+.big { font-size: 34px; font-weight: 600; }
+.gain { color: var(--gain); } .loss { color: var(--loss); } .model { color: var(--model); }
+.grid2 { display: grid; gap: var(--s5); grid-template-columns: 1fr; }
+@media (min-width: 640px) { .grid2 { grid-template-columns: 1fr 1fr; } }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { text-align: left; padding: var(--s2) var(--s2) var(--s2) 0; border-bottom: 1px solid var(--surface); }
+th { color: var(--ink-2); font-weight: 500; }
+.num { text-align: right; }
+.search { position: relative; max-width: 560px; }
+.search label { display: block; margin-bottom: var(--s2); }
+.search h1 { margin: 0 0 var(--s2); font-size: 1.25rem; }
+.search h1 label { margin-bottom: 0; }
+.search input { width: 100%; font: inherit; padding: var(--s3); border: 1px solid var(--ink-2); border-radius: 6px; background: var(--bg); color: var(--ink); min-height: 44px; }
+.search ul { position: absolute; z-index: 2; left: 0; right: 0; margin: 0; padding: 0; list-style: none; background: var(--bg); border: 1px solid var(--rule); border-radius: 6px; }
+.search li { padding: var(--s2) var(--s3); min-height: 44px; display: flex; gap: var(--s3); align-items: center; cursor: pointer; }
+.search li[aria-selected="true"] { background: var(--surface); }
+footer.site { padding: var(--s5) 0 var(--s7); color: var(--ink-2); font-size: 13px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

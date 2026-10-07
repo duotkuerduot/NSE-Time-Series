@@ -1,0 +1,258 @@
+[project]
+name = "nsefc"
+version = "0.1.0"
+description = "NSE daily forecast platform: ingestion, validation, forecasting and static API publishing"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Proprietary" }
+dependencies = [
+    "boto3>=1.35",
+    "httpx>=0.27",
+    "pydantic>=2.8",
+    "pyyaml>=6.0",
+    "typer>=0.12",
+]
+
+[project.scripts]
+nsefc = "nsefc.cli:app"
+
+[dependency-groups]
+dev = [
+    "hypothesis>=6.100",
+    "import-linter>=2.1",
+    "moto[s3]>=5.0",
+    "mypy>=1.11",
+    "pytest>=8.3",
+    "pytest-cov>=5.0",
+    "ruff>=0.6",
+    "types-pyyaml>=6.0",
+]
+
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/nsefc"]
+
+# ---------------------------------------------------------------- ruff
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests", "scripts"]
+extend-exclude = ["web", "research", "NSE Data"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF", "DTZ", "PT", "N", "C4", "PIE"]
+ignore = ["RUF001", "RUF002", "RUF003"]  # en dashes and section signs are intentional in docs and strings
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["DTZ001", "DTZ005", "PT018", "E501"]
+
+# ---------------------------------------------------------------- mypy
+[tool.mypy]
+python_version = "3.11"
+strict = true
+files = ["src"]
+plugins = ["pydantic.mypy"]
+warn_unreachable = true
+
+[[tool.mypy.overrides]]
+module = ["tests.*"]
+disallow_untyped_defs = false
+
+[[tool.mypy.overrides]]
+module = ["boto3", "boto3.*", "botocore.*", "moto", "moto.*"]
+ignore_missing_imports = true
+
+# ---------------------------------------------------------------- pytest
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = [
+    "slow: long-running; runs nightly and before promotions (ENGINEERING.md 28.2)",
+    "network: needs the internet; never runs in CI",
+]
+
+# ---------------------------------------------------------------- import-linter
+# Module dependency rules from ENGINEERING.md section 6.2. Two matter most:
+# features may not import targets (structural leakage guard), and models/prediction
+# may not import ingestion (the ML layer stays provider-independent).
+[tool.importlinter]
+root_package = "nsefc"
+include_external_packages = false
+
+[[tool.importlinter.contracts]]
+name = "domain is pure: it imports nothing else from nsefc"
+type = "forbidden"
+source_modules = ["nsefc.domain"]
+forbidden_modules = [
+    "nsefc.calendar", "nsefc.storage", "nsefc.reference", "nsefc.quality", "nsefc.ingestion",
+    "nsefc.features", "nsefc.targets", "nsefc.models", "nsefc.intervals", "nsefc.training",
+    "nsefc.evaluation", "nsefc.selection", "nsefc.registry", "nsefc.prediction",
+    "nsefc.monitoring", "nsefc.api", "nsefc.publishing", "nsefc.pipeline", "nsefc.cli",
+    "nsefc.config",
+]
+
+[[tool.importlinter.contracts]]
+name = "calendar depends only on domain"
+type = "forbidden"
+source_modules = ["nsefc.calendar"]
+forbidden_modules = [
+    "nsefc.storage", "nsefc.reference", "nsefc.quality", "nsefc.ingestion", "nsefc.features",
+    "nsefc.targets", "nsefc.models", "nsefc.intervals", "nsefc.training", "nsefc.evaluation",
+    "nsefc.selection", "nsefc.registry", "nsefc.prediction", "nsefc.monitoring", "nsefc.api",
+    "nsefc.publishing", "nsefc.pipeline", "nsefc.cli", "nsefc.config",
+]
+
+[[tool.importlinter.contracts]]
+name = "config is a leaf: settings never import business modules"
+type = "forbidden"
+source_modules = ["nsefc.config"]
+forbidden_modules = [
+    "nsefc.calendar", "nsefc.storage", "nsefc.reference", "nsefc.quality", "nsefc.ingestion",
+    "nsefc.features", "nsefc.targets", "nsefc.models", "nsefc.intervals", "nsefc.training",
+    "nsefc.evaluation", "nsefc.selection", "nsefc.registry", "nsefc.prediction",
+    "nsefc.monitoring", "nsefc.api", "nsefc.publishing", "nsefc.pipeline", "nsefc.cli",
+]
+
+[[tool.importlinter.contracts]]
+name = "storage never imports business modules"
+type = "forbidden"
+source_modules = ["nsefc.storage"]
+forbidden_modules = [
+    "nsefc.calendar", "nsefc.reference", "nsefc.quality", "nsefc.ingestion", "nsefc.features",
+    "nsefc.targets", "nsefc.models", "nsefc.intervals", "nsefc.training", "nsefc.evaluation",
+    "nsefc.selection", "nsefc.registry", "nsefc.prediction", "nsefc.monitoring",
+    "nsefc.publishing", "nsefc.pipeline", "nsefc.cli",
+]
+
+[[tool.importlinter.contracts]]
+name = "reference never imports models or anything downstream"
+type = "forbidden"
+source_modules = ["nsefc.reference"]
+forbidden_modules = [
+    "nsefc.quality", "nsefc.ingestion", "nsefc.features", "nsefc.targets", "nsefc.models",
+    "nsefc.intervals", "nsefc.training", "nsefc.evaluation", "nsefc.selection",
+    "nsefc.registry", "nsefc.prediction", "nsefc.monitoring", "nsefc.publishing",
+    "nsefc.pipeline", "nsefc.cli",
+]
+
+[[tool.importlinter.contracts]]
+name = "quality never imports features or models"
+type = "forbidden"
+source_modules = ["nsefc.quality"]
+forbidden_modules = [
+    "nsefc.ingestion", "nsefc.features", "nsefc.targets", "nsefc.models", "nsefc.intervals",
+    "nsefc.training", "nsefc.evaluation", "nsefc.selection", "nsefc.registry",
+    "nsefc.prediction", "nsefc.monitoring", "nsefc.publishing", "nsefc.pipeline", "nsefc.cli",
+]
+
+[[tool.importlinter.contracts]]
+name = "ingestion is independent of ML and publishing"
+type = "forbidden"
+source_modules = ["nsefc.ingestion"]
+forbidden_modules = [
+    "nsefc.features", "nsefc.targets", "nsefc.models", "nsefc.intervals", "nsefc.training",
+    "nsefc.evaluation", "nsefc.selection", "nsefc.registry", "nsefc.prediction",
+    "nsefc.monitoring", "nsefc.api", "nsefc.publishing", "nsefc.pipeline", "nsefc.cli",
+]
+
+[[tool.importlinter.contracts]]
+name = "features cannot see targets or models (leakage rule L2)"
+type = "forbidden"
+source_modules = ["nsefc.features"]
+forbidden_modules = [
+    "nsefc.targets", "nsefc.models", "nsefc.intervals", "nsefc.training", "nsefc.evaluation",
+    "nsefc.selection", "nsefc.registry", "nsefc.prediction", "nsefc.monitoring",
+    "nsefc.publishing", "nsefc.ingestion", "nsefc.quality", "nsefc.pipeline", "nsefc.cli",
+]
+
+[[tool.importlinter.contracts]]
+name = "targets depend only on domain, calendar and reference"
+type = "forbidden"
+source_modules = ["nsefc.targets"]
+forbidden_modules = [
+    "nsefc.storage", "nsefc.quality", "nsefc.ingestion", "nsefc.features", "nsefc.models",
+    "nsefc.intervals", "nsefc.training", "nsefc.evaluation", "nsefc.selection",
+    "nsefc.registry", "nsefc.prediction", "nsefc.monitoring", "nsefc.api",
+    "nsefc.publishing", "nsefc.pipeline", "nsefc.cli",
+]
+
+[[tool.importlinter.contracts]]
+name = "models and intervals are pure: domain only"
+type = "forbidden"
+source_modules = ["nsefc.models", "nsefc.intervals"]
+forbidden_modules = [
+    "nsefc.calendar", "nsefc.storage", "nsefc.reference", "nsefc.quality", "nsefc.ingestion",
+    "nsefc.features", "nsefc.targets", "nsefc.training", "nsefc.evaluation",
+    "nsefc.selection", "nsefc.registry", "nsefc.prediction", "nsefc.monitoring", "nsefc.api",
+    "nsefc.publishing", "nsefc.pipeline", "nsefc.cli", "nsefc.config",
+]
+
+[[tool.importlinter.contracts]]
+name = "training, evaluation and selection never touch ingestion or publishing"
+type = "forbidden"
+source_modules = ["nsefc.training", "nsefc.evaluation", "nsefc.selection"]
+forbidden_modules = [
+    "nsefc.ingestion", "nsefc.publishing", "nsefc.prediction", "nsefc.pipeline", "nsefc.cli",
+]
+
+[[tool.importlinter.contracts]]
+name = "registry does not import training internals"
+type = "forbidden"
+source_modules = ["nsefc.registry"]
+forbidden_modules = [
+    "nsefc.training", "nsefc.evaluation", "nsefc.selection", "nsefc.ingestion",
+    "nsefc.prediction", "nsefc.monitoring", "nsefc.publishing", "nsefc.pipeline", "nsefc.cli",
+]
+
+[[tool.importlinter.contracts]]
+name = "prediction never imports training or ingestion"
+type = "forbidden"
+source_modules = ["nsefc.prediction"]
+forbidden_modules = [
+    "nsefc.training", "nsefc.evaluation", "nsefc.selection", "nsefc.ingestion",
+    "nsefc.publishing", "nsefc.pipeline", "nsefc.cli",
+]
+
+[[tool.importlinter.contracts]]
+name = "monitoring reads storage and metrics only"
+type = "forbidden"
+source_modules = ["nsefc.monitoring"]
+forbidden_modules = [
+    "nsefc.ingestion", "nsefc.training", "nsefc.selection", "nsefc.prediction",
+    "nsefc.publishing", "nsefc.pipeline", "nsefc.cli",
+]
+
+[[tool.importlinter.contracts]]
+name = "the API contract depends only on domain"
+type = "forbidden"
+source_modules = ["nsefc.api"]
+forbidden_modules = [
+    "nsefc.calendar", "nsefc.storage", "nsefc.reference", "nsefc.quality", "nsefc.ingestion",
+    "nsefc.features", "nsefc.targets", "nsefc.models", "nsefc.intervals", "nsefc.training",
+    "nsefc.evaluation", "nsefc.selection", "nsefc.registry", "nsefc.prediction",
+    "nsefc.monitoring", "nsefc.publishing", "nsefc.pipeline", "nsefc.cli", "nsefc.config",
+]
+
+[[tool.importlinter.contracts]]
+name = "publishing never imports models or features"
+type = "forbidden"
+source_modules = ["nsefc.publishing"]
+forbidden_modules = [
+    "nsefc.models", "nsefc.features", "nsefc.targets", "nsefc.intervals", "nsefc.training",
+    "nsefc.evaluation", "nsefc.selection", "nsefc.ingestion", "nsefc.quality",
+    "nsefc.pipeline", "nsefc.cli",
+]
+
+[[tool.importlinter.contracts]]
+name = "only the CLI imports the pipeline; nothing imports the CLI"
+type = "forbidden"
+source_modules = [
+    "nsefc.domain", "nsefc.calendar", "nsefc.storage", "nsefc.reference", "nsefc.quality",
+    "nsefc.ingestion", "nsefc.features", "nsefc.targets", "nsefc.models", "nsefc.intervals",
+    "nsefc.training", "nsefc.evaluation", "nsefc.selection", "nsefc.registry",
+    "nsefc.prediction", "nsefc.monitoring", "nsefc.api", "nsefc.publishing", "nsefc.config",
+]
+forbidden_modules = ["nsefc.pipeline", "nsefc.cli"]

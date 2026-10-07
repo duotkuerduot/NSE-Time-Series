@@ -1,0 +1,17 @@
+# Stage boundaries and evaluation settings (ENGINEERING.md 17). Fixed before Stage B runs.
+history:
+  # The repository dataset starts 2007-01-02 (not 2005) and has no data for Jul-Dec 2020.
+  training_min_start_date: 2007-01-02
+stages:
+  A_tuning: {test_years: [2012, 2013, 2014, 2015, 2016, 2017], folds: annual_expanding}
+  B_selection: {start: 2018-01-01, end: 2023-12-31, refit: monthly}
+  C_lockbox: {start: 2024-01-01, end: 2025-12-31, refit: monthly, touch_once: true}
+  D_prelive: {start: 2026-01-01, end: go_live, optional: true}
+embargo_sessions: 1
+metrics:
+  primary: mae_skill_vs_no_change
+  flat_band: 0.001
+tests:
+  diebold_mariano: {one_sided: true, newey_west_lags: 5}
+  block_bootstrap: {block_sessions: 20, resamples: 2000}
+  multiplicity: holm            # review ML-2 and ML-3

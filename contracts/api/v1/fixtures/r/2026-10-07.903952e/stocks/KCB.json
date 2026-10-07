@@ -1,0 +1,26 @@
+{
+  "ticker": "KCB",
+  "name": "KCB Group Plc",
+  "sector": "Banking",
+  "segment": "Main Investment Market Segment",
+  "status": "active",
+  "latest": {
+    "session": "2026-10-07",
+    "close": 59.7,
+    "prev_close": 59.52,
+    "change": 0.18,
+    "change_pct": 0.003,
+    "volume": 109079,
+    "turnover": 6512016.3
+  },
+  "range_52w": {
+    "low": 50.71,
+    "high": 78.21
+  },
+  "price_basis": "vwap",
+  "flags": {
+    "suspended": false,
+    "corporate_action_today": false,
+    "ex_dividend_today": false
+  }
+}

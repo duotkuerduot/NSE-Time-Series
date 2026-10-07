@@ -1,0 +1,35 @@
+# Promotion gates (ENGINEERING.md 18.3). Changing a threshold after seeing Stage B results
+# requires an ADR. Review ML-8: calibrate the churn and correlation thresholds on Stage A
+# before Stage B is frozen, and record the basis here.
+gates:
+  G2_min_skill_vs_no_change: 0.02
+  G2_max_p_value: 0.05
+  G3_max_p_value_vs_best_baseline: 0.10
+  G3_benchmark: microstructure_only   # review MF-6: same learner, microstructure features only
+  G4:
+    min_positive_years: 5
+    min_positive_quarter_share: 0.60
+    min_year_skill: -0.02
+    min_security_nonnegative_share: 0.60
+    max_seed_sd_to_mean: 0.25
+    min_refit_churn_correlation: 0.80   # basis: TO BE CALIBRATED ON STAGE A
+  G6:
+    pooled_coverage: [0.75, 0.85]
+    per_security_coverage: [0.70, 0.90]
+    per_security_share: 0.80
+  G7:
+    lockbox_min_skill_ratio: 0.5
+    lockbox_coverage: [0.72, 0.88]
+  G8_tripwire:
+    max_skill: 0.15
+    max_directional_accuracy: 0.65
+    relative_to: best_microstructure_baseline   # review MF-6
+  G9:
+    min_shadow_sessions: 20
+    max_inference_seconds: 60
+challenger:
+  min_live_shadow_sessions: 60
+  max_p_value_vs_incumbent: 0.10
+  max_changes_per_quarter: 1
+refit:
+  min_prediction_correlation: 0.80

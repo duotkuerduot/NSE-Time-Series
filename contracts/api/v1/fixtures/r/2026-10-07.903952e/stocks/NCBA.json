@@ -1,0 +1,26 @@
+{
+  "ticker": "NCBA",
+  "name": "NCBA Group PLC",
+  "sector": "Banking",
+  "segment": "Main Investment Market Segment",
+  "status": "active",
+  "latest": {
+    "session": "2026-10-07",
+    "close": 143.97,
+    "prev_close": 147.16,
+    "change": -3.19,
+    "change_pct": -0.0217,
+    "volume": 658331,
+    "turnover": 94779914.07
+  },
+  "range_52w": {
+    "low": 109.48,
+    "high": 155.14
+  },
+  "price_basis": "vwap",
+  "flags": {
+    "suspended": false,
+    "corporate_action_today": false,
+    "ex_dividend_today": false
+  }
+}

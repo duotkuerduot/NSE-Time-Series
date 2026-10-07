@@ -1,0 +1,6 @@
+storage:
+  backend: r2
+  public_base_url: https://api.example.co.ke/v1   # replace once the custom domain exists
+providers:
+  # Provisional (ADR-003): confirmed or replaced by the Phase 0 spike.
+  chain: [nse_pricelist, kingdom]

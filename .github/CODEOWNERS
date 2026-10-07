@@ -1,0 +1,9 @@
+# Reviews required for the files that decide what the model sees and what reaches users
+# (ENGINEERING.md 28.1). Replace with the ML and data owners' handles as the team grows.
+*                                   @duotkuerduot
+/src/nsefc/features/                @duotkuerduot
+/src/nsefc/targets/                 @duotkuerduot
+/config/champion.yaml               @duotkuerduot
+/config/promotion_policy.yaml       @duotkuerduot
+/reference/                         @duotkuerduot
+/config/calendar/                   @duotkuerduot
