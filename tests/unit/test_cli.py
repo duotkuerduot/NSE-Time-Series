@@ -1,66 +1,79 @@
+"""The command line (§3): usage errors, guidance when inputs are missing, exit codes (§3.3)."""
+
 from __future__ import annotations
 
-from datetime import UTC, date, datetime
 from pathlib import Path
 
-import pytest
-from typer.testing import CliRunner
-
-from nsefc import cli
-from nsefc.ingestion import spike
-from nsefc.ingestion.spike import Observation, load_observations
-from nsefc.storage.objectstore import LocalObjectStore
-
-runner = CliRunner()
+from nsefc import __version__
+from tests.conftest import cli
 
 
-@pytest.fixture
-def in_repo(repo_root: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
-    """Run commands from the repository root, with local storage in a temporary directory."""
-    monkeypatch.chdir(repo_root)
-    monkeypatch.setenv("NSEFC__STORAGE__LOCAL_ROOT", str(tmp_path))
-    return tmp_path
+def test_version(tmp_path: Path) -> None:
+    result = cli(["--version"], tmp_path)
+    assert result.exit_code == 0 and __version__ in result.output
 
 
-def test_probe_keeps_observations_made_before_a_crash(
-    in_repo: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    def fake_observe(client, provider, session_date, *, mode, store, now=None):  # type: ignore[no-untyped-def]
-        if provider.provider_id == "kingdom":
-            raise RuntimeError("runner lost its network")
-        return Observation(
-            provider.provider_id,
-            session_date,
-            "https://example.test/file.pdf",
-            datetime(2026, 10, 7, 15, 10, tzinfo=UTC),
-            mode,
-            404,
-            False,
-        )
+def test_usage_errors_exit_2(tmp_path: Path) -> None:
+    assert cli(["run", "--sample", "--source-dir", str(tmp_path)], tmp_path).exit_code == 2
+    assert cli(["run", "--profile", "turbo", "--no-serve"], tmp_path).exit_code == 2
 
-    monkeypatch.setattr(spike, "observe", fake_observe)
-    result = runner.invoke(
-        cli.app, ["spike", "probe", "--env", "ci", "--as-of", "2026-10-07", "--no-store"]
+
+def test_stages_explain_missing_inputs(tmp_path: Path) -> None:
+    for command in (["ingest"], ["train"], ["predict"], ["publish"]):
+        result = cli(command, tmp_path)
+        assert result.exit_code == 2, command
+        assert "run" in result.output, command
+
+
+def test_missing_dataset_folder_exits_10(tmp_path: Path) -> None:
+    result = cli(["acquire", "--source-dir", str(tmp_path / "nowhere")], tmp_path)
+    assert result.exit_code == 10
+    assert "--sample" in result.output
+
+
+def test_status_and_serve_before_any_run(tmp_path: Path) -> None:
+    assert "No data yet" in cli(["status"], tmp_path).output
+    result = cli(["serve", "--no-browser"], tmp_path)
+    assert result.exit_code == 2 and "No results yet" in result.output
+
+
+def test_import_needs_a_dataset_first(tmp_path: Path) -> None:
+    csv = tmp_path / "new.csv"
+    csv.write_text("date,ticker,close,volume\n2025-11-03,SCOM,28.4,100\n", encoding="utf-8")
+    result = cli(["import", str(csv)], tmp_path / "data")
+    assert result.exit_code == 2 and "before importing" in result.output
+
+
+def test_maintainer_checks_pass_on_a_clean_tree(tmp_path: Path) -> None:
+    assert cli(["dev", "contract", "--check"], tmp_path).exit_code == 0
+    assert cli(["dev", "web-hash", "--check"], tmp_path).exit_code == 0
+    assert "Mashujaa" in cli(["dev", "calendar", "2025"], tmp_path).output
+
+
+def test_import_round_trip(tmp_path: Path) -> None:
+    """§5.5: imports add later sessions, are labelled, and may not overlap."""
+    from nsefc.storage import read_json
+    from tests.unit.test_ingest import GOLDEN
+
+    source = tmp_path / "dataset"
+    source.mkdir()
+    (source / "NSE_data_all_stocks_2025.csv").write_text(GOLDEN, encoding="utf-8")
+    data = tmp_path / "data"
+    assert cli(["acquire", "--source-dir", str(source)], data).exit_code == 0
+    assert cli(["ingest"], data).exit_code == 0
+    new = tmp_path / "new.csv"
+    new.write_text(
+        "date,ticker,close,volume\n2025-01-08,KUKZ,396,700\n2025-01-08,EGAD,13,0\n",
+        encoding="utf-8",
     )
-    assert isinstance(result.exception, RuntimeError)
-    saved = load_observations(LocalObjectStore(in_repo / "private"))
-    assert [(o.provider_id, o.session_date) for o in saved] == [
-        ("nse_pricelist", date(2026, 10, 7))
-    ]
-
-
-def test_backcheck_rejects_a_blank_date(in_repo: Path) -> None:
-    result = runner.invoke(
-        cli.app, ["spike", "backcheck", "--env", "ci", "--from", "", "--to", "2026-10-07"]
-    )
-    assert result.exit_code == 2
-    assert "--from must be a date" in result.output
-
-
-@pytest.mark.parametrize("command", [["data", "profile"], ["calendar", "reconcile"]])
-def test_data_commands_fail_without_price_files(
-    in_repo: Path, tmp_path: Path, command: list[str]
-) -> None:
-    result = runner.invoke(cli.app, [*command, "--data-dir", str(tmp_path / "missing")])
-    assert result.exit_code == 2
-    assert "no NSE_data_all_stocks_*.csv files" in result.output
+    result = cli(["import", str(new)], data)
+    assert result.exit_code == 0 and "Imported 2 rows" in result.output
+    assert cli(["import", str(new)], data).exit_code == 20  # the same sessions again
+    old = tmp_path / "old.csv"
+    old.write_text("date,ticker,close,volume\n2025-01-07,KUKZ,396,700\n", encoding="utf-8")
+    rejected = cli(["import", str(old)], data)
+    assert rejected.exit_code == 20 and "on or before" in rejected.output
+    assert cli(["ingest"], data).exit_code == 0
+    report = read_json(data / "canonical" / "ingest_report.json")
+    assert report["data_mode"] == "historical+imports" and report["last_session"] == "2025-01-08"
+    assert report["dataset_last_session"] == "2025-01-07"

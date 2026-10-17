@@ -55,7 +55,7 @@ describe("language rules", () => {
   it("keeps every UI string inside the rules", () => {
     const problems: string[] = [];
     const copyText = JSON.stringify(COPY, (_key, value: unknown) =>
-      typeof value === "function" ? value("2026-10-07", "2026-10-07", "2026-10-07", "2026-10-07") : value,
+      typeof value === "function" ? value(...Array<string>(6).fill("2026-10-07")) : value,
     );
     if (offences(copyText).length) problems.push(`copy.ts: ${offences(copyText).join(", ")}`);
     for (const file of sourceFiles(join(__dirname, ".."))) {

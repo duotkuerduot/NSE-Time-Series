@@ -13,13 +13,15 @@ from nsefc.api.v1 import (
     RESOURCES,
     MarketOverview,
     PriceHistory,
+    Report,
+    Site,
     Status,
     StockDetail,
     StockPrediction,
     StocksIndex,
 )
 
-SCHEMA_BASE_ID = "https://nsefc.local/contracts/api/v1/"
+SCHEMA_BASE_ID = "https://github.com/duotkuerduot/NSE-Time-Series/contracts/api/v1/"
 
 _RELEASE = r"r/(?P<release>\d{4}-\d{2}-\d{2}\.[0-9a-f]{7,64})"
 _TICKER = r"(?P<ticker>[A-Z0-9&.\-]{2,12})"
@@ -30,6 +32,8 @@ _PATHS: list[tuple[re.Pattern[str], type[BaseModel]]] = [
     (re.compile(rf"^{_RELEASE}/stocks/{_TICKER}/history\.(1y|max)\.json$"), PriceHistory),
     (re.compile(rf"^{_RELEASE}/stocks/{_TICKER}/prediction\.json$"), StockPrediction),
     (re.compile(rf"^{_RELEASE}/market/overview\.json$"), MarketOverview),
+    (re.compile(rf"^{_RELEASE}/report\.json$"), Report),
+    (re.compile(rf"^{_RELEASE}/site\.json$"), Site),
 ]
 
 

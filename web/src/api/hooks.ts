@@ -3,6 +3,8 @@ import { fetchJson, NotFoundError, releasePath } from "./client";
 import type {
   MarketOverview,
   PriceHistory,
+  Report,
+  Site,
   Status,
   StockDetail,
   StockPrediction,
@@ -27,13 +29,15 @@ function useReleaseResource<T>(path: string | null) {
     queryKey: ["release", release, path],
     queryFn: () => fetchJson<T>(releasePath({ release_id: release as string }, path as string)),
     enabled: Boolean(release && path),
-    staleTime: Infinity, // releases are immutable
+    staleTime: Infinity, // a release never changes once published
     retry,
   });
 }
 
 export const useStocks = () => useReleaseResource<StocksIndex>("stocks.json");
 export const useOverview = () => useReleaseResource<MarketOverview>("market/overview.json");
+export const useReport = () => useReleaseResource<Report>("report.json");
+export const useSite = () => useReleaseResource<Site>("site.json");
 export const useStock = (ticker: string) => useReleaseResource<StockDetail>(`stocks/${ticker}.json`);
 export const useHistory = (ticker: string, range: "1y" | "max") =>
   useReleaseResource<PriceHistory>(`stocks/${ticker}/history.${range}.json`);

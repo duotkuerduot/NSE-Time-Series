@@ -1,0 +1,21 @@
+# `--sample`: the synthetic dataset (2015-2024, 30 fictional tickers). Shorter periods and a
+# shorter history requirement so the whole run takes under two minutes (§16.3).
+periods:
+  tuning: ["2016-01-01", "2016-12-31"]
+  selection: ["2018-01-01", "2020-12-31"]
+  holdout_start: "2021-01-01"
+  calibration_warmup_sessions: 250
+
+universe:
+  min_history: 250
+
+profiles:
+  default:
+    refit: semiannual
+    candidates: [ridge, huber, lightgbm]
+    tune: false
+  full:
+    refit: quarterly
+    candidates: [ridge, huber, lightgbm, catboost]
+    tune: true
+    trials: 10

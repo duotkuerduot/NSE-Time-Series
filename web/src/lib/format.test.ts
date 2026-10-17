@@ -8,6 +8,7 @@ import {
   formatPct,
   formatSessionDate,
   formatSignedPrice,
+  gapStarts,
 } from "./format";
 
 describe("format", () => {
@@ -50,5 +51,23 @@ describe("format", () => {
 
   it("shows timestamps in Nairobi time", () => {
     expect(formatEat("2026-10-07T15:47:55Z")).toBe("7 Oct 2026, 18:47 EAT");
+  });
+});
+
+describe("periods and shares", () => {
+  it("formats months, periods and unsigned shares", async () => {
+    const { formatMonthYear, formatPeriod, formatShare } = await import("./format");
+    expect(formatMonthYear("2023-01-03")).toBe("Jan 2023");
+    expect(formatPeriod("2023-01-01", "2025-10-30")).toBe("Jan 2023 to Oct 2025");
+    expect(formatShare(0.8012)).toBe("80.1%");
+    expect(formatShare(0.0142, 2)).toBe("1.42%");
+  });
+
+  it("finds holes in the data but not weekends or holiday runs", () => {
+    expect(gapStarts(["2024-12-24", "2024-12-27", "2024-12-30"])).toEqual([]); // Christmas
+    expect(gapStarts(["2026-04-02", "2026-04-07"])).toEqual([]); // Easter: Thu -> Tue
+    // November and December 2025 are missing from the dataset.
+    expect(gapStarts(["2025-10-30", "2025-10-31", "2026-01-02", "2026-01-05"])).toEqual([2]);
+    expect(gapStarts([])).toEqual([]);
   });
 });

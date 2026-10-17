@@ -1,8 +1,14 @@
-# M3 CatBoost (ENGINEERING.md 16.4).
-loss: [MAE, Huber, RMSE]
-depth: {low: 3, high: 6}
-learning_rate: {low: 0.01, high: 0.1, log: true}
-l2_leaf_reg: {low: 1, high: 30}
-max_iterations: 2000
-fixed: {random_seed: 20261007, thread_count: 4}
-tuning: {sampler: tpe, trials: 40, seed: 20261007}
+# M3 CatBoost (§10.2), full profile only (`uv run --extra full nsefc run --profile full`).
+label: "CatBoost"
+frozen:
+  loss_function: MAE
+  depth: 4
+  learning_rate: 0.05
+  l2_leaf_reg: 3.0
+  iterations: 1000
+  early_stopping_rounds: 50
+search:
+  loss_function: {choices: [MAE, Huber]}
+  depth: {low: 3, high: 6, integer: true}
+  learning_rate: {low: 0.01, high: 0.1, log: true}
+  l2_leaf_reg: {low: 1.0, high: 30.0, log: true}

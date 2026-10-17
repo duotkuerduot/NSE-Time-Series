@@ -1,7 +1,8 @@
 import type { Status } from "../api";
 
-// A static system reports its own staleness: if the next release has not replaced status.json
-// by `stale_after`, the frontend shows the banner without any server involved (22.3).
+// The banner shows only when a release declares when the next one is due and that time has
+// passed. Local runs publish `stale_after: null`: historical data is never late (§15.2).
 export function isStale(status: Pick<Status, "stale_after">, now: Date = new Date()): boolean {
+  if (status.stale_after == null) return false;
   return now.getTime() > new Date(status.stale_after).getTime();
 }

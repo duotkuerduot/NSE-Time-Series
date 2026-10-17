@@ -29,3 +29,40 @@ th { color: var(--ink-2); font-weight: 500; }
 .search li[aria-selected="true"] { background: var(--surface); }
 footer.site { padding: var(--s5) 0 var(--s7); color: var(--ink-2); font-size: 13px; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+h3 { font-size: 15px; font-weight: 600; margin: var(--s5) 0 var(--s2); }
+.lead { font-size: 16px; max-width: 72ch; }
+.page-search { padding-top: var(--s4); }
+.notice { margin: var(--s3) 0 0; padding: var(--s2) var(--s3); font-size: 13px; background: var(--surface); border-left: 4px solid var(--model); }
+details { margin: var(--s2) 0; font-size: 13px; }
+details summary { cursor: pointer; padding: var(--s1) 0; }
+details ul { margin: var(--s2) 0; padding-left: var(--s5); }
+ul.links { padding-left: var(--s5); }
+footer.site a, main a { text-underline-offset: 2px; }
+.chart { margin: var(--s3) 0; }
+.chart .plot { display: grid; grid-template-columns: auto 1fr; grid-template-rows: 180px auto; column-gap: var(--s2); }
+.chart .y-labels { position: relative; min-width: 4.5em; font-size: 12px; color: var(--ink-2); }
+.chart .y-labels span { position: absolute; right: 0; transform: translateY(-50%); white-space: nowrap; }
+.chart svg { width: 100%; height: 180px; display: block; overflow: visible; }
+.chart .x-labels { grid-column: 2; display: flex; justify-content: space-between; font-size: 12px; color: var(--ink-2); padding-top: var(--s1); }
+.chart path { fill: none; vector-effect: non-scaling-stroke; }
+.chart .axis { stroke: var(--rule); stroke-width: 1; }
+.chart .line { stroke-width: 2; stroke-linejoin: round; }
+.chart .line.ink { stroke: var(--ink); }
+.chart .line.model { stroke: var(--model); }
+.chart .line.muted { stroke: var(--ink-2); stroke-dasharray: 5 4; }
+.chart .marker { stroke: var(--loss); stroke-width: 8; stroke-linecap: round; }
+.chart .range .band { stroke: var(--model); stroke-width: 8; stroke-linecap: round; opacity: 0.35; }
+.chart .range .point { stroke: var(--model); stroke-width: 10; stroke-linecap: round; }
+.chart .bars { display: grid; gap: var(--s2); }
+.chart .bar-col { display: flex; flex-direction: column; align-items: stretch; min-width: 0; }
+.chart .bar-area { position: relative; height: 150px; margin: 20px 0; }
+.chart .zero { position: absolute; left: -4px; right: -4px; border-top: 1px solid var(--rule); }
+.chart .bar { position: absolute; left: 20%; right: 20%; background: var(--model); }
+.chart .bar-value { position: absolute; left: 0; right: 0; text-align: center; font-size: 12px; color: var(--ink); white-space: nowrap; }
+.chart .bar-label { text-align: center; font-size: 12px; color: var(--ink-2); }
+.legend { display: flex; flex-wrap: wrap; gap: var(--s3); font-size: 12px; color: var(--ink-2); margin-top: var(--s1); }
+.legend .key::before { content: ""; display: inline-block; width: 16px; height: 3px; margin-right: 6px; vertical-align: middle; background: var(--ink); }
+.legend .key.model::before { background: var(--model); }
+.legend .key.muted::before { background: repeating-linear-gradient(90deg, var(--ink-2) 0 5px, transparent 5px 9px); }
+.legend .key.marker::before { width: 8px; height: 8px; border-radius: 50%; background: var(--loss); }
+.legend .key.range::before { width: 6px; height: 14px; border-radius: 3px; background: var(--model); opacity: 0.6; }

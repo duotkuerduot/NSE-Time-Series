@@ -1,20 +1,22 @@
 """Core types (Security, Session, Bar, Prediction) and enums. No I/O.
 
-Implemented in phase 0 (ENGINEERING.md section 34).
+Kept from Phase 0; extended for the local-first tool (ENGINEERING.md 2.0, §4.1).
 """
 
 from nsefc.domain.enums import (
     CheckScope,
     CorporateActionType,
+    DataMode,
     DirectionOutcome,
-    Environment,
+    InstrumentType,
     ModelStatus,
     PredictionRole,
     PriceBasis,
-    RunType,
     SecurityStatus,
     SessionIngestStatus,
+    SessionStatus,
     Severity,
+    SourceKind,
     UnavailableReason,
 )
 from nsefc.domain.types import (
@@ -41,20 +43,22 @@ __all__ = [
     "CorporateAction",
     "CorporateActionType",
     "DailyBar",
+    "DataMode",
     "DirectionOutcome",
     "DomainError",
-    "Environment",
     "IndexLevel",
+    "InstrumentType",
     "ModelStatus",
     "Prediction",
     "PredictionRole",
     "PredictionSupersession",
     "PriceBasis",
-    "RunType",
     "Security",
     "SecurityStatus",
     "SecuritySymbol",
     "SessionIngestStatus",
+    "SessionStatus",
     "Severity",
+    "SourceKind",
     "UnavailableReason",
 ]

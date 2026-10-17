@@ -1,8 +1,10 @@
-"""API contract v1: every static resource the frontend reads (ENGINEERING.md 22.3).
+"""API contract v1.1: every static file the frontend reads (ENGINEERING.md §13).
 
-These models validate every generated file before upload, export JSON Schema to
+These models validate every published file before it is written, export JSON Schema to
 ``contracts/api/v1`` and generate the frontend's TypeScript types, so the two sides cannot
-drift apart silently. Amendments from the design review are marked "review FE-4" and so on.
+drift apart silently. v1.1 (local-first, §13.3) adds ``data_mode`` and ``dataset`` to the
+status, makes ``stale_after`` nullable, adds ``target_in_past`` and ``target_from_calendar``
+to the latest forecast, and adds ``report.json`` and ``site.json``.
 """
 
 from __future__ import annotations
@@ -16,6 +18,7 @@ from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, model_validato
 from nsefc.domain import DirectionOutcome, UnavailableReason
 
 API_VERSION: Final = "1"
+CONTRACT_VERSION: Final = "1.1"
 Ticker = Annotated[str, Field(pattern=r"^[A-Z0-9&.\-]{2,12}$", description="NSE ticker, e.g. SCOM")]
 Fraction = Annotated[float, Field(description="A ratio, e.g. 0.0124 for 1.24%")]
 ErrorSize = Annotated[float, Field(ge=0, description="An average absolute error, e.g. 0.0124")]
@@ -64,24 +67,39 @@ class PipelineStatus(_Resource):
         "succeeded", "failed", "running", "data_not_yet_available", "quarantined", "skipped"
     ]
     finished_at: Timestamp | None
-    primary_source: str | None
-    fallback_used: bool
+    primary_source: Literal["mendeley", "local", "sample"]
+    fallback_used: bool = Field(description="Always false in local mode")
     dq: Literal["passed", "held", "failed", "not_run"]
 
 
+class DatasetInfo(_Resource):
+    """Where the data came from, for the header, footer and About page (v1.1)."""
+
+    source: Literal["mendeley", "local", "sample"]
+    title: str
+    version: int | None
+    first_session: date
+    last_session: date
+    licence: str | None
+    citation: str | None
+    doi: str | None
+    url: str | None
+
+
 class Status(_Resource):
-    """Mutable pointer to the current release. Cached for 60 seconds (22.2)."""
+    """Pointer to the current release, plus run and data status (§13.3)."""
 
     api_version: Literal["1"] = API_VERSION
+    contract_version: Literal["1.1"] = CONTRACT_VERSION
     release_id: ReleaseId
     generated_at: Timestamp
     latest_session: date
     next_session: date
-    stale_after: Timestamp = Field(
-        description=(
-            "When the next release is due; past this time the frontend shows the stale banner"
-        )
+    stale_after: Timestamp | None = Field(
+        description="When the next release is due; null in local mode, where data is never late"
     )
+    data_mode: Literal["historical", "historical+imports", "sample"]
+    dataset: DatasetInfo
     pipeline: PipelineStatus
     champion: ModelRef | None
     notices: list[Notice] = Field(default_factory=list)
@@ -163,7 +181,7 @@ class StockDetail(_Resource):
 # ---------------------------------------------------------------------------- history
 class PriceEvent(_Resource):
     date: date
-    type: Literal["ex_dividend", "bonus", "split", "rights", "suspension", "listing"]
+    type: Literal["ex_dividend", "bonus", "split", "rights", "suspension", "listing", "large_move"]
     label: str
 
 
@@ -205,6 +223,12 @@ class ForecastLatest(_Resource):
     generated_at: Timestamp
     data_through: date
     is_late: bool
+    target_in_past: bool = Field(
+        description="True when the target session is before today on the user's machine"
+    )
+    target_from_calendar: bool = Field(
+        description="False when the calendar does not cover the target: it is the next weekday"
+    )
 
     @model_validator(mode="after")
     def _consistent(self) -> ForecastLatest:
@@ -358,6 +382,98 @@ class MarketOverview(_Resource):
     charts: MarketCharts
 
 
+# ---------------------------------------------------------------------------- /report.json (v1.1)
+class ReportPeriod(_Resource):
+    start: date
+    end: date
+
+
+class ReportPeriods(_Resource):
+    selection: ReportPeriod
+    holdout: ReportPeriod
+
+
+class ReportUniverse(_Resource):
+    min: int = Field(ge=0)
+    max: int = Field(ge=0)
+    median: int = Field(ge=0)
+    at_last_session: int = Field(ge=0)
+
+
+class ReportGate(_Resource):
+    id: str = Field(description="Gate id from ENGINEERING.md §11.4, e.g. G-SKILL")
+    name: str = Field(description="Plain-language name shown in the app")
+    passed: bool
+    detail: str
+
+
+class ReportScores(_Resource):
+    mae: ErrorSize
+    mae_no_change: ErrorSize
+    skill: float = Field(description="1 - MAE / MAE of the no-change guess")
+    dm_p: float | None = Field(description="One-sided Diebold-Mariano p-value against no change")
+    coverage: Share | None = Field(description="Share of actual closes inside the 80% range")
+    direction_accuracy: Share | None
+    rows: int = Field(ge=0)
+    securities: int = Field(ge=0)
+
+
+class ReportModel(_Resource):
+    model_id: str
+    label: str
+    is_champion: bool
+    selection: ReportScores
+    holdout: ReportScores | None
+    gates: list[ReportGate]
+    skill_by_year: dict[str, float]
+
+
+class ReportChampion(_Resource):
+    model_id: str
+    label: str
+    reason: str
+
+
+class DataAudit(_Resource):
+    sessions: int = Field(ge=0)
+    securities: int = Field(ge=0)
+    corrections_applied: int = Field(ge=0)
+    rows_corrected: int = Field(ge=0)
+    duplicates_dropped: int = Field(ge=0)
+    missing_sessions: int = Field(ge=0)
+    events_excluded: int = Field(ge=0)
+    carried_forward_rows: int = Field(ge=0)
+
+
+class Report(_Resource):
+    """Evaluation results for the About page (§13.3 item 4)."""
+
+    profile: Literal["default", "full"]
+    refit: str
+    periods: ReportPeriods
+    dataset: DatasetInfo
+    universe: ReportUniverse
+    champion: ReportChampion
+    headline: ReportScores | None = Field(description="The champion's holdout scores")
+    models: list[ReportModel]
+    data_audit: DataAudit
+
+
+# ---------------------------------------------------------------------------- /site.json (v1.1)
+class SiteLink(_Resource):
+    label: str
+    url: str = Field(pattern=r"^(https://|http://|mailto:)")
+
+
+class Site(_Resource):
+    """Owner name and contact links from config/site.yaml, plus dataset attribution."""
+
+    owner_name: str
+    tagline: str
+    links: list[SiteLink]
+    attribution: str
+
+
 # Published resources: file name in a release -> model. Schema files take the same names.
 RESOURCES: dict[str, type[BaseModel]] = {
     "status": Status,
@@ -366,4 +482,6 @@ RESOURCES: dict[str, type[BaseModel]] = {
     "history": PriceHistory,
     "prediction": StockPrediction,
     "overview": MarketOverview,
+    "report": Report,
+    "site": Site,
 }

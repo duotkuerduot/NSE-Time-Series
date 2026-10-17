@@ -6,7 +6,7 @@ import { gzipSync } from "node:zlib";
 
 const BUDGET = 150 * 1024;
 // fileURLToPath, not URL.pathname: the latter keeps %20 for spaces and breaks on Windows.
-const dir = fileURLToPath(new URL("../dist/assets/", import.meta.url));
+const dir = fileURLToPath(new URL("../../src/nsefc/web_dist/assets/", import.meta.url));
 const files = (await readdir(dir)).filter((f) => f.endsWith(".js"));
 let total = 0;
 for (const f of files) total += gzipSync(await readFile(join(dir, f))).length;

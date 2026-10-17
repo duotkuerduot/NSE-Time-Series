@@ -1,4 +1,11 @@
-"""Conformal calibrators (section 19).
+"""Prediction intervals (§12): volatility-scaled split conformal, 80% level."""
 
-Implemented in phase 8 (ENGINEERING.md section 34).
-"""
+from nsefc.intervals.conformal import (
+    floor_sigma,
+    interval,
+    quantile_levels,
+    rolling_quantiles,
+    static_quantiles,
+)
+
+__all__ = ["floor_sigma", "interval", "quantile_levels", "rolling_quantiles", "static_quantiles"]

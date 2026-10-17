@@ -1,27 +1,45 @@
 {
   "api_version": "1",
-  "release_id": "2026-10-07.903952e",
-  "generated_at": "2026-10-07T15:48:12Z",
-  "latest_session": "2026-10-07",
-  "next_session": "2026-10-08",
-  "stale_after": "2026-10-08T19:00:00Z",
+  "contract_version": "1.1",
+  "release_id": "2025-10-31.724342c280ef",
+  "generated_at": "2026-10-16T19:15:22Z",
+  "latest_session": "2025-10-31",
+  "next_session": "2025-11-03",
+  "stale_after": null,
+  "data_mode": "historical",
+  "dataset": {
+    "source": "mendeley",
+    "title": "Kenya Nairobi Securities Exchange (NSE) All Stocks Prices 2026",
+    "version": 1,
+    "first_session": "2007-01-02",
+    "last_session": "2025-10-31",
+    "licence": null,
+    "citation": "Wanjawa, Barack (2026), \"Kenya Nairobi Securities Exchange (NSE) All Stocks Prices 2026\", Mendeley Data, V1, doi: 10.17632/hvmhnp7f9r.1",
+    "doi": "10.17632/hvmhnp7f9r.1",
+    "url": "https://doi.org/10.17632/hvmhnp7f9r.1"
+  },
   "pipeline": {
     "status": "succeeded",
-    "finished_at": "2026-10-07T15:48:12Z",
-    "primary_source": "nse_pricelist",
+    "finished_at": "2026-10-16T19:15:22Z",
+    "primary_source": "mendeley",
     "fallback_used": false,
     "dq": "passed"
   },
   "champion": {
-    "model_id": "m_20261001_lgbm_7c1e9a",
+    "model_id": "lightgbm",
     "label": "LightGBM",
-    "version": "2026.10.1"
+    "version": "20261016T191213Z"
   },
   "notices": [
     {
       "code": "FIXTURE",
       "message": "Fixture data: values are illustrative, not market data.",
       "severity": "warning"
+    },
+    {
+      "code": "PERSONAL_USE",
+      "message": "The dataset's licence is not recorded here; use the data for personal research.",
+      "severity": "info"
     }
   ]
 }

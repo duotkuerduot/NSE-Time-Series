@@ -1,6 +1,7 @@
 # ADR-016: Phase 0 decisions and design-review amendments
 
-Status: accepted, 8 October 2026. Extends ENGINEERING.md; where they differ, this record wins.
+Status: accepted, 8 October 2026; the storage, scheduling and CI-artifact parts are superseded by
+ADR-017 (local-first). The calendar, data-model, contract and language decisions still hold. Extends ENGINEERING.md; where they differ, this record wins.
 The review IDs (MF-, D-, ML-, P-, FE-) refer to the design review in the KARD project.
 
 ## Calendar

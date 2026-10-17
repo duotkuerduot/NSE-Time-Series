@@ -1,0 +1,26 @@
+{
+  "ticker": "EQTY",
+  "name": "Equity Group Holdings Plc",
+  "sector": "Banking",
+  "segment": null,
+  "status": "active",
+  "latest": {
+    "session": "2025-10-31",
+    "close": 34.81,
+    "prev_close": 35.19,
+    "change": -0.38,
+    "change_pct": -0.010799,
+    "volume": 1051070,
+    "turnover": null
+  },
+  "range_52w": {
+    "low": 34.47,
+    "high": 49.72
+  },
+  "price_basis": "vwap",
+  "flags": {
+    "suspended": false,
+    "corporate_action_today": false,
+    "ex_dividend_today": false
+  }
+}

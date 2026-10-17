@@ -1,6 +1,39 @@
-"""ForecastModel implementations: baselines, linear, LightGBM, CatBoost.
+"""Baselines (§10.1), candidates (§10.2) and hashed artifacts (§10.3). Pure estimators."""
 
-Pure: no storage or ingestion.
+from nsefc.models.artifacts import ArtifactError, load_artifact, save_artifact
+from nsefc.models.estimators import (
+    AR1,
+    BASELINES,
+    CANDIDATES,
+    CatBoostModel,
+    Drift,
+    Forecaster,
+    HuberModel,
+    LightGBMModel,
+    ModelUnavailable,
+    MovingAverage,
+    NoChange,
+    RidgeModel,
+    family_rank,
+    lad_line,
+)
 
-Implemented in phase 5-6 (ENGINEERING.md section 34).
-"""
+__all__ = [
+    "AR1",
+    "BASELINES",
+    "CANDIDATES",
+    "ArtifactError",
+    "CatBoostModel",
+    "Drift",
+    "Forecaster",
+    "HuberModel",
+    "LightGBMModel",
+    "ModelUnavailable",
+    "MovingAverage",
+    "NoChange",
+    "RidgeModel",
+    "family_rank",
+    "lad_line",
+    "load_artifact",
+    "save_artifact",
+]

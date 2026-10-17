@@ -1,0 +1,26 @@
+{
+  "ticker": "ABSA",
+  "name": "Absa Bank Kenya PLC",
+  "sector": "Banking",
+  "segment": null,
+  "status": "active",
+  "latest": {
+    "session": "2025-10-31",
+    "close": 12.81,
+    "prev_close": 12.97,
+    "change": -0.16,
+    "change_pct": -0.012336,
+    "volume": 322963,
+    "turnover": null
+  },
+  "range_52w": {
+    "low": 10.34,
+    "high": 14.08
+  },
+  "price_basis": "vwap",
+  "flags": {
+    "suspended": false,
+    "corporate_action_today": false,
+    "ex_dividend_today": false
+  }
+}

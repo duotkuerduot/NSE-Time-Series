@@ -1,4 +1,25 @@
-"""Promotion gates and policy (section 18).
+"""Gates and champion selection (§11.4, §11.5)."""
 
-Implemented in phase 7 (ENGINEERING.md section 34).
-"""
+from nsefc.selection.gates import (
+    GATE_ORDER,
+    SIMPLE_BASELINES,
+    Assessment,
+    Choice,
+    Gate,
+    PlausibilityError,
+    choose_champion,
+    evaluate_gates,
+    plausibility,
+)
+
+__all__ = [
+    "GATE_ORDER",
+    "SIMPLE_BASELINES",
+    "Assessment",
+    "Choice",
+    "Gate",
+    "PlausibilityError",
+    "choose_champion",
+    "evaluate_gates",
+    "plausibility",
+]

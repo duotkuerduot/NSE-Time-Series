@@ -167,3 +167,67 @@ def test_forecast_consistency_allows_rounding(
     else:
         with pytest.raises(ValidationError, match="last_close"):
             v1.StockPrediction.model_validate(data)
+
+
+# ---------------------------------------------------------------- contract v1.1 (§13.3)
+@pytest.mark.parametrize(
+    ("path", "model"),
+    [
+        ("r/2025-10-31.724342c280ef/report.json", v1.Report),
+        ("r/2025-10-31.724342c280ef/site.json", v1.Site),
+        ("report.json", None),
+    ],
+)
+def test_v11_resource_paths(path: str, model: type | None) -> None:
+    assert resource_for(path) is model
+
+
+def test_status_v11_fields(fixtures: Path) -> None:
+    data = load(fixtures, "status.json")
+    status = v1.Status.model_validate(data)
+    assert status.contract_version == "1.1" and status.stale_after is None
+    assert status.data_mode == "historical" and status.dataset.doi == "10.17632/hvmhnp7f9r.1"
+    data["data_mode"] = "live"
+    with pytest.raises(ValidationError):
+        v1.Status.model_validate(data)
+
+
+def test_latest_forecast_v11_fields(fixtures: Path) -> None:
+    latest = load(fixtures, "r/*/stocks/SCOM/prediction.json")["latest"]
+    assert latest["target_in_past"] is True and latest["target_from_calendar"] is True
+    del latest["target_in_past"]
+    with pytest.raises(ValidationError):
+        v1.ForecastLatest.model_validate(latest)
+
+
+@pytest.mark.parametrize("url", ["javascript:alert(1)", "ftp://example.com", "www.example.com"])
+def test_site_links_must_be_web_or_mail(fixtures: Path, url: str) -> None:
+    data = load(fixtures, "r/*/site.json")
+    data["links"] = [{"label": "Bad", "url": url}]
+    with pytest.raises(ValidationError):
+        v1.Site.model_validate(data)
+
+
+def test_report_gates_carry_plain_names(fixtures: Path) -> None:
+    report = v1.Report.model_validate(load(fixtures, "r/*/report.json"))
+    names = {g.name for m in report.models for g in m.gates}
+    assert "Confirmed on the holdout period" in names
+    assert sum(m.is_champion for m in report.models) == 1
+
+
+def test_typescript_types_exist_for_every_schema(repo_root: Path) -> None:
+    generated = {
+        p.name.removesuffix(".gen.ts")
+        for p in (repo_root / "web" / "src" / "api" / "types").glob("*.gen.ts")
+    }
+    assert generated == set(v1.RESOURCES)
+
+
+def test_every_unavailable_reason_has_copy(repo_root: Path) -> None:
+    from nsefc.domain import UnavailableReason
+
+    copy = (repo_root / "web" / "src" / "lib" / "copy.ts").read_text(encoding="utf-8")
+    block = copy.split("noForecast: {", 1)[1].split("},", 1)[0]
+    assert {reason.value for reason in UnavailableReason} <= {
+        line.split(":")[0].strip() for line in block.splitlines() if ":" in line
+    }

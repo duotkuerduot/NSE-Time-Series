@@ -1,0 +1,57 @@
+{
+  "$defs": {
+    "SiteLink": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "url": {
+          "pattern": "^(https://|http://|mailto:)",
+          "title": "Url",
+          "type": "string"
+        }
+      },
+      "required": [
+        "label",
+        "url"
+      ],
+      "title": "SiteLink",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Owner name and contact links from config/site.yaml, plus dataset attribution.",
+  "properties": {
+    "owner_name": {
+      "title": "Owner Name",
+      "type": "string"
+    },
+    "tagline": {
+      "title": "Tagline",
+      "type": "string"
+    },
+    "links": {
+      "items": {
+        "$ref": "#/$defs/SiteLink"
+      },
+      "title": "Links",
+      "type": "array"
+    },
+    "attribution": {
+      "title": "Attribution",
+      "type": "string"
+    }
+  },
+  "required": [
+    "owner_name",
+    "tagline",
+    "links",
+    "attribution"
+  ],
+  "title": "Site",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/duotkuerduot/NSE-Time-Series/contracts/api/v1/site.schema.json"
+}

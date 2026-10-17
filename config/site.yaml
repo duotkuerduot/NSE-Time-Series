@@ -1,0 +1,8 @@
+# Shown in the app's footer and About page, and in the README's Contact section (§14, §18).
+# Filled in by the owner. Links may be https://, http:// or mailto: addresses.
+owner_name: "Duot Kuer"
+tagline: "Built by Duot Kuer"
+links:
+  - { label: "GitHub", url: "https://github.com/duotkuerduot" }
+  # - { label: "Email", url: "mailto:you@example.com" }
+  # - { label: "LinkedIn", url: "https://www.linkedin.com/in/your-handle" }

@@ -1,13 +1,17 @@
-import { readFile, stat } from "node:fs/promises";
+import { readFile, stat, writeFile } from "node:fs/promises";
 import { resolve, sep } from "node:path";
 import react from "@vitejs/plugin-react";
 import type { Connect, Plugin } from "vite";
 import { defineConfig } from "vitest/config";
+import { sourceHash } from "./scripts/source-hash.mjs";
 
-const FIXTURES = resolve(import.meta.dirname, "../contracts/api/v1/fixtures");
+const REPO = resolve(import.meta.dirname, "..");
+const FIXTURES = resolve(REPO, "contracts/api/v1/fixtures");
+// The built app ships inside the Python package, so running the tool needs no Node.js (§15.4).
+const OUT_DIR = resolve(REPO, "src/nsefc/web_dist");
 
-// Serves the contract fixtures at /api/v1 so every page renders without a pipeline
-// (Phase 0 acceptance: "the frontend can render every page from fixtures").
+// Serves the contract fixtures at /api/v1 in `vite` and `vite preview`, so every page renders
+// without running the pipeline. The real app is served by `nsefc serve` (§15.5).
 function serveFixtures(): Plugin {
   const middleware: Connect.NextHandleFunction = async (req, res, next) => {
     const url = (req.url ?? "").split("?")[0] ?? "";
@@ -30,9 +34,21 @@ function serveFixtures(): Plugin {
   };
 }
 
+// Records which sources the build came from; `uv run nsefc dev web-hash --check` compares it.
+function recordSourceHash(): Plugin {
+  return {
+    name: "nsefc-source-hash",
+    apply: "build",
+    closeBundle: async () => {
+      await writeFile(resolve(OUT_DIR, ".source-hash"), `${sourceHash(REPO)}\n`, "utf8");
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [react(), serveFixtures()],
-  build: { target: "es2022", sourcemap: true },
+  base: "/",
+  plugins: [react(), serveFixtures(), recordSourceHash()],
+  build: { target: "es2022", outDir: OUT_DIR, emptyOutDir: true, sourcemap: false },
   test: {
     environment: "jsdom",
     include: ["src/**/*.test.{ts,tsx}"],

@@ -1,7 +1,9 @@
 import type { Status } from "./index";
 
-// The API root: fixtures in development, the CDN-backed bucket in production (ADR-012).
-export const API_BASE: string = (import.meta.env.VITE_API_BASE as string | undefined) ?? "/api/v1";
+// The API is the static JSON that `nsefc publish` writes to data/api/v1 and `nsefc serve`
+// serves next to the app (ENGINEERING.md §15.1). In development, Vite serves the contract
+// fixtures at the same path.
+export const API_BASE = "/api/v1";
 
 export class NotFoundError extends Error {
   constructor(public readonly path: string) {
@@ -17,8 +19,8 @@ export async function fetchJson<T>(path: string, init?: RequestInit): Promise<T>
   return (await response.json()) as T;
 }
 
-// status.json names the current immutable release; everything else is read relative to it,
-// so one page never mixes data from two releases (ENGINEERING.md 22.2).
+// status.json names the current release; everything else is read from that release's folder,
+// so one page never mixes data from two runs.
 export function releasePath(status: Pick<Status, "release_id">, path: string): string {
   return `r/${status.release_id}/${path}`;
 }

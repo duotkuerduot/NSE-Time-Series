@@ -1,0 +1,25 @@
+# The dataset this tool uses, and how to cite it (ENGINEERING.md §5, owner decision D-10).
+#
+# The data is NOT downloaded. The repository's "NSE Data/" folder holds the daily price files
+# from the Mendeley Data series "Nairobi Securities Exchange (NSE) All Stocks Prices"
+# (2007-01-02 to 2026-06-30; see docs/data/mendeley-dataset.md). The citation below is the
+# one the owner asked the app, README and run summary to show.
+#
+# licence: left empty until someone checks the dataset page. While it is empty the run
+# summary says the data is for personal research use (§5.3). Fill it in (for example
+# "CC BY 4.0") and add `licence_url` once confirmed.
+folder: NSE Data
+dataset:
+  id: hvmhnp7f9r
+  version: 1
+  title: Kenya Nairobi Securities Exchange (NSE) All Stocks Prices 2026
+  authors: ["Wanjawa, Barack"]
+  year: 2026
+  publisher: Mendeley Data
+  doi: 10.17632/hvmhnp7f9r.1
+  url: https://data.mendeley.com/datasets/hvmhnp7f9r/1
+  licence:
+  licence_url:
+citation: >-
+  Wanjawa, Barack (2026), "Kenya Nairobi Securities Exchange (NSE) All Stocks Prices 2026",
+  Mendeley Data, V1, doi: 10.17632/hvmhnp7f9r.1

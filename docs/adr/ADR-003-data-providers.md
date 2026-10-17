@@ -1,6 +1,7 @@
 # ADR-003: Data providers (update 1, provisional)
 
-Status: provisional, pending the 10-session spike. Supersedes the provisional assignment in
+Status: superseded by ADR-017 (16 October 2026): no live providers in the local-first design.
+Previously: provisional, pending the 10-session spike. Supersedes the provisional assignment in
 ENGINEERING.md section 36 (Kingdom primary, KenyaStocks secondary). Date: 8 October 2026.
 
 ## Decision so far

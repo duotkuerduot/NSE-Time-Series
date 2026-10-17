@@ -1,0 +1,488 @@
+{
+  "$defs": {
+    "DataAudit": {
+      "additionalProperties": false,
+      "properties": {
+        "sessions": {
+          "minimum": 0,
+          "title": "Sessions",
+          "type": "integer"
+        },
+        "securities": {
+          "minimum": 0,
+          "title": "Securities",
+          "type": "integer"
+        },
+        "corrections_applied": {
+          "minimum": 0,
+          "title": "Corrections Applied",
+          "type": "integer"
+        },
+        "rows_corrected": {
+          "minimum": 0,
+          "title": "Rows Corrected",
+          "type": "integer"
+        },
+        "duplicates_dropped": {
+          "minimum": 0,
+          "title": "Duplicates Dropped",
+          "type": "integer"
+        },
+        "missing_sessions": {
+          "minimum": 0,
+          "title": "Missing Sessions",
+          "type": "integer"
+        },
+        "events_excluded": {
+          "minimum": 0,
+          "title": "Events Excluded",
+          "type": "integer"
+        },
+        "carried_forward_rows": {
+          "minimum": 0,
+          "title": "Carried Forward Rows",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "sessions",
+        "securities",
+        "corrections_applied",
+        "rows_corrected",
+        "duplicates_dropped",
+        "missing_sessions",
+        "events_excluded",
+        "carried_forward_rows"
+      ],
+      "title": "DataAudit",
+      "type": "object"
+    },
+    "DatasetInfo": {
+      "additionalProperties": false,
+      "description": "Where the data came from, for the header, footer and About page (v1.1).",
+      "properties": {
+        "source": {
+          "enum": [
+            "mendeley",
+            "local",
+            "sample"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "version": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Version"
+        },
+        "first_session": {
+          "format": "date",
+          "title": "First Session",
+          "type": "string"
+        },
+        "last_session": {
+          "format": "date",
+          "title": "Last Session",
+          "type": "string"
+        },
+        "licence": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Licence"
+        },
+        "citation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Citation"
+        },
+        "doi": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Doi"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Url"
+        }
+      },
+      "required": [
+        "source",
+        "title",
+        "version",
+        "first_session",
+        "last_session",
+        "licence",
+        "citation",
+        "doi",
+        "url"
+      ],
+      "title": "DatasetInfo",
+      "type": "object"
+    },
+    "ReportChampion": {
+      "additionalProperties": false,
+      "properties": {
+        "model_id": {
+          "title": "Model Id",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "model_id",
+        "label",
+        "reason"
+      ],
+      "title": "ReportChampion",
+      "type": "object"
+    },
+    "ReportGate": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "Gate id from ENGINEERING.md §11.4, e.g. G-SKILL",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "description": "Plain-language name shown in the app",
+          "title": "Name",
+          "type": "string"
+        },
+        "passed": {
+          "title": "Passed",
+          "type": "boolean"
+        },
+        "detail": {
+          "title": "Detail",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "passed",
+        "detail"
+      ],
+      "title": "ReportGate",
+      "type": "object"
+    },
+    "ReportModel": {
+      "additionalProperties": false,
+      "properties": {
+        "model_id": {
+          "title": "Model Id",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "is_champion": {
+          "title": "Is Champion",
+          "type": "boolean"
+        },
+        "selection": {
+          "$ref": "#/$defs/ReportScores"
+        },
+        "holdout": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ReportScores"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "gates": {
+          "items": {
+            "$ref": "#/$defs/ReportGate"
+          },
+          "title": "Gates",
+          "type": "array"
+        },
+        "skill_by_year": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Skill By Year",
+          "type": "object"
+        }
+      },
+      "required": [
+        "model_id",
+        "label",
+        "is_champion",
+        "selection",
+        "holdout",
+        "gates",
+        "skill_by_year"
+      ],
+      "title": "ReportModel",
+      "type": "object"
+    },
+    "ReportPeriod": {
+      "additionalProperties": false,
+      "properties": {
+        "start": {
+          "format": "date",
+          "title": "Start",
+          "type": "string"
+        },
+        "end": {
+          "format": "date",
+          "title": "End",
+          "type": "string"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "title": "ReportPeriod",
+      "type": "object"
+    },
+    "ReportPeriods": {
+      "additionalProperties": false,
+      "properties": {
+        "selection": {
+          "$ref": "#/$defs/ReportPeriod"
+        },
+        "holdout": {
+          "$ref": "#/$defs/ReportPeriod"
+        }
+      },
+      "required": [
+        "selection",
+        "holdout"
+      ],
+      "title": "ReportPeriods",
+      "type": "object"
+    },
+    "ReportScores": {
+      "additionalProperties": false,
+      "properties": {
+        "mae": {
+          "description": "An average absolute error, e.g. 0.0124",
+          "minimum": 0,
+          "title": "Mae",
+          "type": "number"
+        },
+        "mae_no_change": {
+          "description": "An average absolute error, e.g. 0.0124",
+          "minimum": 0,
+          "title": "Mae No Change",
+          "type": "number"
+        },
+        "skill": {
+          "description": "1 - MAE / MAE of the no-change guess",
+          "title": "Skill",
+          "type": "number"
+        },
+        "dm_p": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "One-sided Diebold-Mariano p-value against no change",
+          "title": "Dm P"
+        },
+        "coverage": {
+          "anyOf": [
+            {
+              "description": "A share of cases, e.g. 0.8 for 80%",
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Share of actual closes inside the 80% range",
+          "title": "Coverage"
+        },
+        "direction_accuracy": {
+          "anyOf": [
+            {
+              "description": "A share of cases, e.g. 0.8 for 80%",
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Direction Accuracy"
+        },
+        "rows": {
+          "minimum": 0,
+          "title": "Rows",
+          "type": "integer"
+        },
+        "securities": {
+          "minimum": 0,
+          "title": "Securities",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "mae",
+        "mae_no_change",
+        "skill",
+        "dm_p",
+        "coverage",
+        "direction_accuracy",
+        "rows",
+        "securities"
+      ],
+      "title": "ReportScores",
+      "type": "object"
+    },
+    "ReportUniverse": {
+      "additionalProperties": false,
+      "properties": {
+        "min": {
+          "minimum": 0,
+          "title": "Min",
+          "type": "integer"
+        },
+        "max": {
+          "minimum": 0,
+          "title": "Max",
+          "type": "integer"
+        },
+        "median": {
+          "minimum": 0,
+          "title": "Median",
+          "type": "integer"
+        },
+        "at_last_session": {
+          "minimum": 0,
+          "title": "At Last Session",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "min",
+        "max",
+        "median",
+        "at_last_session"
+      ],
+      "title": "ReportUniverse",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Evaluation results for the About page (§13.3 item 4).",
+  "properties": {
+    "profile": {
+      "enum": [
+        "default",
+        "full"
+      ],
+      "title": "Profile",
+      "type": "string"
+    },
+    "refit": {
+      "title": "Refit",
+      "type": "string"
+    },
+    "periods": {
+      "$ref": "#/$defs/ReportPeriods"
+    },
+    "dataset": {
+      "$ref": "#/$defs/DatasetInfo"
+    },
+    "universe": {
+      "$ref": "#/$defs/ReportUniverse"
+    },
+    "champion": {
+      "$ref": "#/$defs/ReportChampion"
+    },
+    "headline": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ReportScores"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "The champion's holdout scores"
+    },
+    "models": {
+      "items": {
+        "$ref": "#/$defs/ReportModel"
+      },
+      "title": "Models",
+      "type": "array"
+    },
+    "data_audit": {
+      "$ref": "#/$defs/DataAudit"
+    }
+  },
+  "required": [
+    "profile",
+    "refit",
+    "periods",
+    "dataset",
+    "universe",
+    "champion",
+    "headline",
+    "models",
+    "data_audit"
+  ],
+  "title": "Report",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/duotkuerduot/NSE-Time-Series/contracts/api/v1/report.schema.json"
+}

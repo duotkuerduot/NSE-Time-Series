@@ -284,6 +284,20 @@ class TradingCalendar:
             current += timedelta(days=1)
         return current
 
+    def next_session_or_weekday(self, day: date) -> tuple[date, bool]:
+        """The next session, or the next weekday when ``day`` is past the calendar's coverage.
+
+        The second value says whether the calendar answered (§7 point 4): when it is False,
+        the app labels the date "next weekday (calendar not available)".
+        """
+        try:
+            return self.next_session(day), True
+        except CalendarCoverageError:
+            current = _as_date(day) + timedelta(days=1)
+            while current.weekday() >= SATURDAY:
+                current += timedelta(days=1)
+            return current, False
+
     def previous_session(self, day: date) -> date:
         """The last scheduled session strictly before ``day``."""
         current = self._check(day) - timedelta(days=1)

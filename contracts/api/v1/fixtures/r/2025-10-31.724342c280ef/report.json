@@ -1,0 +1,331 @@
+{
+  "profile": "default",
+  "refit": "quarterly",
+  "periods": {
+    "selection": {
+      "start": "2018-01-01",
+      "end": "2022-12-31"
+    },
+    "holdout": {
+      "start": "2023-01-01",
+      "end": "2025-10-30"
+    }
+  },
+  "dataset": {
+    "source": "mendeley",
+    "title": "Kenya Nairobi Securities Exchange (NSE) All Stocks Prices 2026",
+    "version": 1,
+    "first_session": "2007-01-02",
+    "last_session": "2025-10-31",
+    "licence": null,
+    "citation": "Wanjawa, Barack (2026), \"Kenya Nairobi Securities Exchange (NSE) All Stocks Prices 2026\", Mendeley Data, V1, doi: 10.17632/hvmhnp7f9r.1",
+    "doi": "10.17632/hvmhnp7f9r.1",
+    "url": "https://doi.org/10.17632/hvmhnp7f9r.1"
+  },
+  "universe": {
+    "min": 16,
+    "max": 29,
+    "median": 20,
+    "at_last_session": 26
+  },
+  "champion": {
+    "model_id": "lightgbm",
+    "label": "LightGBM",
+    "reason": "LightGBM passed every gate with the lowest selection-period miss"
+  },
+  "headline": {
+    "mae": 0.014275,
+    "mae_no_change": 0.014522,
+    "skill": 0.017,
+    "dm_p": 0.16,
+    "coverage": 0.8159,
+    "direction_accuracy": 0.5696,
+    "rows": 14210,
+    "securities": 26
+  },
+  "models": [
+    {
+      "model_id": "B0",
+      "label": "No-change guess",
+      "is_champion": false,
+      "selection": {
+        "mae": 0.014073,
+        "mae_no_change": 0.014073,
+        "skill": 0.0,
+        "dm_p": 0.5,
+        "coverage": 0.7906,
+        "direction_accuracy": 0.5773,
+        "rows": 21480,
+        "securities": 24
+      },
+      "holdout": {
+        "mae": 0.014363,
+        "mae_no_change": 0.014363,
+        "skill": 0.0,
+        "dm_p": 0.5,
+        "coverage": 0.8014,
+        "direction_accuracy": 0.5822,
+        "rows": 14210,
+        "securities": 26
+      },
+      "gates": [],
+      "skill_by_year": {
+        "2018": 0.0,
+        "2019": 0.0,
+        "2020": 0.0,
+        "2021": 0.0,
+        "2022": 0.0,
+        "2023": 0.0,
+        "2024": 0.0,
+        "2025": 0.0
+      }
+    },
+    {
+      "model_id": "B3",
+      "label": "AR(1) baseline",
+      "is_champion": false,
+      "selection": {
+        "mae": 0.013452,
+        "mae_no_change": 0.013506,
+        "skill": 0.004,
+        "dm_p": 0.42,
+        "coverage": 0.8001,
+        "direction_accuracy": 0.6005,
+        "rows": 21480,
+        "securities": 24
+      },
+      "holdout": {
+        "mae": 0.013983,
+        "mae_no_change": 0.014025,
+        "skill": 0.003,
+        "dm_p": 0.44,
+        "coverage": 0.8063,
+        "direction_accuracy": 0.5732,
+        "rows": 14210,
+        "securities": 26
+      },
+      "gates": [
+        {
+          "id": "G-INT",
+          "name": "Integrity checks",
+          "passed": true,
+          "detail": "artifact hash verified"
+        },
+        {
+          "id": "G-SKILL",
+          "name": "Beats the no-change guess",
+          "passed": false,
+          "detail": "skill +0.40% (needs >= 1%)"
+        },
+        {
+          "id": "G-BASE",
+          "name": "Beats the simple baselines",
+          "passed": true,
+          "detail": "vs B3"
+        },
+        {
+          "id": "G-STAB",
+          "name": "Stable from year to year",
+          "passed": true,
+          "detail": "positive in 4 of 5 years"
+        },
+        {
+          "id": "G-DIR",
+          "name": "Direction no worse than simple rules",
+          "passed": true,
+          "detail": "not worse than the best trivial rule"
+        },
+        {
+          "id": "G-CAL",
+          "name": "80% range is calibrated",
+          "passed": true,
+          "detail": "80% range contained the actual close 80.4% of the time"
+        },
+        {
+          "id": "G-HOLD",
+          "name": "Confirmed on the holdout period",
+          "passed": true,
+          "detail": "holdout skill +0.30%"
+        }
+      ],
+      "skill_by_year": {
+        "2018": 0.001278,
+        "2019": 0.003262,
+        "2020": 0.00107,
+        "2021": 0.004124,
+        "2022": 0.008936,
+        "2023": 0.005675,
+        "2024": 0.004398,
+        "2025": 0.006619
+      }
+    },
+    {
+      "model_id": "ridge",
+      "label": "Ridge regression",
+      "is_champion": false,
+      "selection": {
+        "mae": 0.01361,
+        "mae_no_change": 0.013449,
+        "skill": -0.012,
+        "dm_p": 0.74,
+        "coverage": 0.7923,
+        "direction_accuracy": 0.5538,
+        "rows": 21480,
+        "securities": 24
+      },
+      "holdout": {
+        "mae": 0.013473,
+        "mae_no_change": 0.01334,
+        "skill": -0.01,
+        "dm_p": 0.7,
+        "coverage": 0.8158,
+        "direction_accuracy": 0.5782,
+        "rows": 14210,
+        "securities": 26
+      },
+      "gates": [
+        {
+          "id": "G-INT",
+          "name": "Integrity checks",
+          "passed": true,
+          "detail": "artifact hash verified"
+        },
+        {
+          "id": "G-SKILL",
+          "name": "Beats the no-change guess",
+          "passed": false,
+          "detail": "skill -1.20% (needs >= 1%)"
+        },
+        {
+          "id": "G-BASE",
+          "name": "Beats the simple baselines",
+          "passed": false,
+          "detail": "vs B3"
+        },
+        {
+          "id": "G-STAB",
+          "name": "Stable from year to year",
+          "passed": false,
+          "detail": "positive in 4 of 5 years"
+        },
+        {
+          "id": "G-DIR",
+          "name": "Direction no worse than simple rules",
+          "passed": true,
+          "detail": "not worse than the best trivial rule"
+        },
+        {
+          "id": "G-CAL",
+          "name": "80% range is calibrated",
+          "passed": true,
+          "detail": "80% range contained the actual close 80.4% of the time"
+        },
+        {
+          "id": "G-HOLD",
+          "name": "Confirmed on the holdout period",
+          "passed": false,
+          "detail": "holdout skill -1.00%"
+        }
+      ],
+      "skill_by_year": {
+        "2018": -0.016699,
+        "2019": -0.020725,
+        "2020": -0.013937,
+        "2021": -0.012088,
+        "2022": -0.010826,
+        "2023": -0.013178,
+        "2024": -0.010093,
+        "2025": -0.004658
+      }
+    },
+    {
+      "model_id": "lightgbm",
+      "label": "LightGBM",
+      "is_champion": true,
+      "selection": {
+        "mae": 0.01412,
+        "mae_no_change": 0.014423,
+        "skill": 0.021,
+        "dm_p": 0.08,
+        "coverage": 0.7918,
+        "direction_accuracy": 0.5831,
+        "rows": 21480,
+        "securities": 24
+      },
+      "holdout": {
+        "mae": 0.014275,
+        "mae_no_change": 0.014522,
+        "skill": 0.017,
+        "dm_p": 0.16,
+        "coverage": 0.8159,
+        "direction_accuracy": 0.5696,
+        "rows": 14210,
+        "securities": 26
+      },
+      "gates": [
+        {
+          "id": "G-INT",
+          "name": "Integrity checks",
+          "passed": true,
+          "detail": "artifact hash verified"
+        },
+        {
+          "id": "G-SKILL",
+          "name": "Beats the no-change guess",
+          "passed": true,
+          "detail": "skill +2.10% (needs >= 1%)"
+        },
+        {
+          "id": "G-BASE",
+          "name": "Beats the simple baselines",
+          "passed": true,
+          "detail": "vs B3"
+        },
+        {
+          "id": "G-STAB",
+          "name": "Stable from year to year",
+          "passed": true,
+          "detail": "positive in 4 of 5 years"
+        },
+        {
+          "id": "G-DIR",
+          "name": "Direction no worse than simple rules",
+          "passed": true,
+          "detail": "not worse than the best trivial rule"
+        },
+        {
+          "id": "G-CAL",
+          "name": "80% range is calibrated",
+          "passed": true,
+          "detail": "80% range contained the actual close 80.4% of the time"
+        },
+        {
+          "id": "G-HOLD",
+          "name": "Confirmed on the holdout period",
+          "passed": true,
+          "detail": "holdout skill +1.70%"
+        }
+      ],
+      "skill_by_year": {
+        "2018": 0.019421,
+        "2019": 0.017993,
+        "2020": 0.01876,
+        "2021": 0.021266,
+        "2022": 0.021759,
+        "2023": 0.023803,
+        "2024": 0.015105,
+        "2025": 0.021136
+      }
+    }
+  ],
+  "data_audit": {
+    "sessions": 4560,
+    "securities": 88,
+    "corrections_applied": 4,
+    "rows_corrected": 228,
+    "duplicates_dropped": 64,
+    "missing_sessions": 155,
+    "events_excluded": 395,
+    "carried_forward_rows": 12661
+  }
+}

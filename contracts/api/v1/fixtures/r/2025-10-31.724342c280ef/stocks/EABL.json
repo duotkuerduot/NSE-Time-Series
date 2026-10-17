@@ -1,0 +1,26 @@
+{
+  "ticker": "EABL",
+  "name": "East African Breweries PLC",
+  "sector": "Manufacturing and Allied",
+  "segment": null,
+  "status": "active",
+  "latest": {
+    "session": "2025-10-31",
+    "close": 388.41,
+    "prev_close": 392.76,
+    "change": -4.35,
+    "change_pct": -0.011075,
+    "volume": 126163,
+    "turnover": null
+  },
+  "range_52w": {
+    "low": 304.83,
+    "high": 422.52
+  },
+  "price_basis": "vwap",
+  "flags": {
+    "suspended": false,
+    "corporate_action_today": false,
+    "ex_dividend_today": false
+  }
+}

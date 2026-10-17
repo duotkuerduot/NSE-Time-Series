@@ -1,14 +1,30 @@
 import { Link, Outlet, useLocation } from "react-router";
-import { useStatus } from "../api/hooks";
+import type { Status } from "../api";
+import { useSite, useStatus } from "../api/hooks";
 import { COPY } from "../lib/copy";
-import { formatEat } from "../lib/format";
 import { isStale } from "../lib/staleness";
 import { StockSearch } from "./StockSearch";
 
+/** "Data through Fri 31 Oct 2025 · Mendeley Data v1", or "· Sample data" (§15.2). */
+export function dataLabel(status: Status): string {
+  const through = COPY.dataThrough(status.latest_session);
+  const imported = status.data_mode === "historical+imports" ? `, ${COPY.withImports}` : "";
+  const source =
+    status.data_mode === "sample"
+      ? COPY.sampleData
+      : status.dataset.source === "mendeley"
+        ? COPY.mendeleyData(status.dataset.version)
+        : COPY.localFiles;
+  return `${through}${imported} · ${source}`;
+}
+
 export function AppShell() {
   const status = useStatus();
+  const site = useSite();
   const { pathname } = useLocation();
   const data = status.data;
+  const notices = data?.notices ?? [];
+  const dataset = data?.dataset;
 
   return (
     <div className="shell">
@@ -16,14 +32,13 @@ export function AppShell() {
         <Link to="/" className="wordmark">
           {COPY.wordmark}
         </Link>
-        {data && (
-          <p className="meta">
-            {COPY.dataTo(data.latest_session)}
-            <br />
-            {COPY.updated(formatEat(data.generated_at))}
-          </p>
-        )}
+        {data && <p className="meta">{dataLabel(data)}</p>}
       </header>
+      {data?.data_mode === "sample" && (
+        <p className="notice sample" role="note">
+          {COPY.sampleNotice}
+        </p>
+      )}
       {status.isError && (
         <div className="banner" role="alert">
           {COPY.cannotReach} <button onClick={() => status.refetch()}>{COPY.retry}</button>
@@ -34,13 +49,15 @@ export function AppShell() {
           {COPY.staleBanner(data.latest_session, data.next_session)}
         </div>
       )}
-      {data?.notices.map((notice) => (
-        <div className="banner" role="status" key={notice.code}>
-          {notice.message}
-        </div>
-      ))}
+      {notices
+        .filter((notice) => notice.severity === "warning")
+        .map((notice) => (
+          <div className="banner" role="status" key={notice.code}>
+            {notice.message}
+          </div>
+        ))}
       {pathname !== "/" && (
-        <div style={{ paddingTop: 16 }}>
+        <div className="page-search">
           <StockSearch />
         </div>
       )}
@@ -49,9 +66,31 @@ export function AppShell() {
       </main>
       <footer className="site">
         <p>{COPY.disclaimer}</p>
-        <p>{COPY.attribution}</p>
+        {dataset?.citation && (
+          <p>
+            {COPY.dataCredit}{" "}
+            {dataset.url ? <a href={dataset.url}>{dataset.citation}</a> : dataset.citation}
+            {dataset.licence ? `. Licence: ${dataset.licence}.` : null}
+          </p>
+        )}
+        {notices
+          .filter((notice) => notice.severity === "info" && notice.code !== "SAMPLE_DATA")
+          .map((notice) => (
+            <p key={notice.code}>{notice.message}</p>
+          ))}
+        {site.data && (
+          <p>
+            {COPY.builtBy(site.data.owner_name)}
+            {site.data.links.map((link) => (
+              <span key={link.url}>
+                {" · "}
+                <a href={link.url}>{link.label}</a>
+              </span>
+            ))}
+          </p>
+        )}
         <p>
-          <Link to="/about">Methodology, limitations and data sources</Link>
+          <Link to="/about">How it works, results, limitations and data</Link>
         </p>
       </footer>
     </div>

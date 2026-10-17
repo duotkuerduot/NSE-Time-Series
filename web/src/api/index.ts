@@ -20,6 +20,17 @@ export type {
   TrackRecord,
   UnavailableReason,
 } from "./types/prediction.gen";
-export type { ModelRef, Notice, PipelineStatus, Status } from "./types/status.gen";
+export type {
+  DataAudit,
+  Report,
+  ReportChampion,
+  ReportGate,
+  ReportModel,
+  ReportPeriod,
+  ReportScores,
+  ReportUniverse,
+} from "./types/report.gen";
+export type { Site, SiteLink } from "./types/site.gen";
+export type { DatasetInfo, ModelRef, Notice, PipelineStatus, Status } from "./types/status.gen";
 export type { LatestSession, Range52W, StockDetail, StockFlags } from "./types/stock.gen";
 export type { LastPrice, StockIndexItem, StocksIndex } from "./types/stocks.gen";

@@ -14,7 +14,7 @@ export type Dates = string[]
 export type Close = number[]
 export type Volume = (number | null)[]
 export type Date = string
-export type Type = ("ex_dividend" | "bonus" | "split" | "rights" | "suspension" | "listing")
+export type Type = ("ex_dividend" | "bonus" | "split" | "rights" | "suspension" | "listing" | "large_move")
 export type Label = string
 export type Events = PriceEvent[]
 

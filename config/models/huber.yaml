@@ -1,0 +1,18 @@
+# M1, Huber variant (§10.2): the same pipeline with a Huber loss, closer to a median forecast.
+label: "Huber regression"
+# Tuned on the tuning period only (2013-2017, 40 Optuna trials, `nsefc dev tune`, 16 Oct 2026)
+# but NOT active: on data to Oct 2025 the default run with these values stopped at G-PLAUS
+# (LightGBM holdout directional accuracy 66.1% > 65%); with the 2026 files it passes at
+# 64.8% and the champion is unchanged. The owner decides (ENGINEERING.md §22 D-30); to use
+# them, replace the `frozen:` block below.
+# frozen:
+#   alpha: 0.2504
+#   epsilon: 1.101
+#   max_iter: 500
+frozen:
+  alpha: 0.0001
+  epsilon: 1.35
+  max_iter: 500
+search:
+  alpha: {low: 0.00001, high: 1.0, log: true}
+  epsilon: {low: 1.1, high: 2.0}

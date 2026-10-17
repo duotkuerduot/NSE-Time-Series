@@ -2,15 +2,16 @@ import { Link } from "react-router";
 import type { Mover } from "../api";
 import { useOverview } from "../api/hooks";
 import { ChangeValue } from "../components/ChangeValue";
+import { LineChart } from "../components/LineChart";
 import { Section } from "../components/Section";
 import { StockSearch } from "../components/StockSearch";
 import { COPY } from "../lib/copy";
-import { formatCompactKes, formatPct, formatPrice, formatSessionDate } from "../lib/format";
+import { formatCompactKes, formatPrice, formatShare } from "../lib/format";
 
 function MoversList({ title, movers }: { title: string; movers: Mover[] }) {
   return (
     <div>
-      <h2>{title}</h2>
+      <h3>{title}</h3>
       <table>
         <tbody>
           {movers.map((m) => (
@@ -31,6 +32,8 @@ function MoversList({ title, movers }: { title: string; movers: Mover[] }) {
   );
 }
 
+const last = <T,>(values: T[] | undefined) => (values && values.length ? values[values.length - 1] : undefined);
+
 export function HomePage() {
   const overview = useOverview();
   const data = overview.data;
@@ -38,7 +41,8 @@ export function HomePage() {
   const trend = data?.charts.index_trend;
   const breadth = data?.charts.breadth;
   const record = data?.charts.track_record;
-  const last = <T,>(values: T[] | undefined) => (values && values.length ? values[values.length - 1] : undefined);
+  // When the champion is the no-change guess, its errors are the no-change errors.
+  const noChange = Boolean(record && record.model_mae_pct_60.every((v, i) => v === record.naive_mae_pct_60[i]));
 
   return (
     <>
@@ -67,6 +71,7 @@ export function HomePage() {
       <Section title="Market movers" isPending={overview.isPending} error={overview.error} onRetry={retry}>
         {data && (
           <>
+            <p className="meta">{COPY.moversOn(data.session)}</p>
             <div className="grid2">
               <MoversList title={COPY.gainers} movers={data.movers.gainers} />
               <MoversList title={COPY.losers} movers={data.movers.losers} />
@@ -77,29 +82,55 @@ export function HomePage() {
       </Section>
       <Section title={COPY.indexTrend} isPending={overview.isPending} error={overview.error} onRetry={retry}>
         {trend && trend.dates.length > 1 && (
-          <p>
-            {trend.index} moved from {formatPrice(trend.level[0] ?? 0)} on {formatSessionDate(trend.dates[0] ?? "")} to{" "}
-            {formatPrice(last(trend.level) ?? 0)} on {formatSessionDate(last(trend.dates) ?? "")}.{" "}
-            <span className="meta">{COPY.chartsLater}</span>
-          </p>
+          <>
+            <LineChart
+              label={`${trend.index} level over the past year`}
+              dates={trend.dates}
+              series={[{ label: trend.index, values: trend.level, tone: "ink" }]}
+              format={formatPrice}
+            />
+            <p>
+              {COPY.indexMoved(
+                trend.index,
+                formatPrice(trend.level[0] ?? 0),
+                trend.dates[0] ?? "",
+                formatPrice(last(trend.level) ?? 0),
+                last(trend.dates) ?? "",
+              )}
+            </p>
+          </>
         )}
       </Section>
       <div className="grid2">
         <Section title={COPY.breadth} isPending={overview.isPending} error={overview.error} onRetry={retry}>
-          {breadth && (
-            <p>
-              Latest session: {last(breadth.advancers)} advancers, {last(breadth.decliners)} decliners,{" "}
-              {last(breadth.unchanged)} unchanged.
-            </p>
+          {breadth && breadth.dates.length > 0 && (
+            <p>{COPY.breadthLatest(last(breadth.advancers) ?? 0, last(breadth.decliners) ?? 0, last(breadth.unchanged) ?? 0)}</p>
           )}
         </Section>
         <Section title={COPY.trackRecord} isPending={overview.isPending} error={overview.error} onRetry={retry}>
           {record && record.dates.length > 0 && (
-            <p>
-              60-session average miss: <span className="model">{formatPct(last(record.model_mae_pct_60) ?? 0).replace("+", "")}</span>{" "}
-              for the model ({last(record.model_label)}, {last(record.basis) === "live" ? "live" : "simulated"}), against{" "}
-              {formatPct(last(record.naive_mae_pct_60) ?? 0).replace("+", "")} for a no-change guess.
-            </p>
+            <>
+              <LineChart
+                label="Rolling 60-session average miss of the model and of a no-change guess"
+                dates={record.dates}
+                series={[
+                  ...(noChange
+                    ? []
+                    : [{ label: last(record.model_label) ?? "Model", values: record.model_mae_pct_60, tone: "model" as const }]),
+                  { label: "No-change guess", values: record.naive_mae_pct_60, tone: "muted" },
+                ]}
+                format={(v) => formatShare(v, 2)}
+              />
+              <p>
+                {noChange
+                  ? COPY.trackRecordNoChange(formatShare(last(record.naive_mae_pct_60) ?? 0, 2))
+                  : COPY.trackRecordHome(
+                      formatShare(last(record.model_mae_pct_60) ?? 0, 2),
+                      formatShare(last(record.naive_mae_pct_60) ?? 0, 2),
+                      last(record.model_label) ?? "model",
+                    )}
+              </p>
+            </>
           )}
         </Section>
       </div>

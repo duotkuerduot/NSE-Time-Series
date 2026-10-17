@@ -74,3 +74,35 @@ export function formatEat(isoTimestamp: string): string {
   const pick = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
   return `${pick("day")} ${pick("month")} ${pick("year")}, ${pick("hour")}:${pick("minute")} EAT`;
 }
+
+/** 0.801 -> "80.1%": an unsigned share or error size. */
+export function formatShare(fraction: number, digits = 1): string {
+  return `${(fraction * 100).toFixed(digits)}%`;
+}
+
+/** "2023-01-03" -> "Jan 2023". */
+export function formatMonthYear(iso: string): string {
+  const [y, m] = iso.split("-").map(Number);
+  if (!y || !m) throw new Error(`not a date: ${iso}`);
+  return `${MONTHS[m - 1]} ${y}`;
+}
+
+/** "Jan 2023 to Oct 2025". */
+export function formatPeriod(start: string, end: string): string {
+  return `${formatMonthYear(start)} to ${formatMonthYear(end)}`;
+}
+
+/** Longest calendar-day step between two sessions that is not a hole in the data: weekends
+ * and holiday runs such as Christmas or Easter stay well under it. */
+export const MAX_SESSION_STEP_DAYS = 10;
+
+/** Indexes of sessions that follow a hole in the data (for example November and December
+ * 2025, between the dataset's 2025 and 2026 files). Charts break their line there. */
+export function gapStarts(dates: string[], maxStepDays = MAX_SESSION_STEP_DAYS): number[] {
+  const day = (iso: string) => Date.parse(`${iso}T00:00:00Z`) / 86_400_000;
+  const starts: number[] = [];
+  for (let i = 1; i < dates.length; i++) {
+    if (day(dates[i] ?? "") - day(dates[i - 1] ?? "") > maxStepDays) starts.push(i);
+  }
+  return starts;
+}

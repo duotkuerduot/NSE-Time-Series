@@ -1,0 +1,26 @@
+{
+  "ticker": "SCOM",
+  "name": "Safaricom PLC",
+  "sector": "Telecommunication",
+  "segment": null,
+  "status": "active",
+  "latest": {
+    "session": "2025-10-31",
+    "close": 35.47,
+    "prev_close": 36.06,
+    "change": -0.59,
+    "change_pct": -0.016362,
+    "volume": 163296,
+    "turnover": null
+  },
+  "range_52w": {
+    "low": 33.72,
+    "high": 43.74
+  },
+  "price_basis": "vwap",
+  "flags": {
+    "suspended": false,
+    "corporate_action_today": false,
+    "ex_dividend_today": false
+  }
+}

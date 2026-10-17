@@ -2,7 +2,7 @@
 #
 # Status values
 #   rule         fixed-date or Easter-based statutory holiday
-#   confirmed    NSE trading data shows no trading that day (repository "NSE Data", 2007-2025)
+#   confirmed    NSE trading data shows no trading that day (repository "NSE Data", 2007 to June 2026)
 #   listed       on published 2024-2026 holiday lists, not yet checked against trading data
 #   provisional  expected but not yet gazetted (moon-dependent) or not verifiable (no data)
 #
@@ -63,7 +63,7 @@ dated:
   - {date: 2023-04-21, name: Idd-ul-Fitr, status: confirmed, source: "NSE data"}
   - {date: 2024-04-10, name: Idd-ul-Fitr, status: confirmed, source: "NSE data; officeholidays.com"}
   - {date: 2025-03-31, name: Idd-ul-Fitr, status: confirmed, source: "NSE data; officeholidays.com"}
-  - {date: 2026-03-20, name: Idd-ul-Fitr, status: listed, source: "officeholidays.com 2026"}
+  - {date: 2026-03-20, name: Idd-ul-Fitr, status: confirmed, source: "NSE data; officeholidays.com"}
   - {date: 2016-09-12, name: Idd-ul-Azha, status: confirmed, source: "NSE data"}
   - {date: 2018-08-21, name: Idd-ul-Azha, status: confirmed, source: "NSE data"}
   - {date: 2019-08-12, name: Idd-ul-Azha, status: confirmed, source: "NSE data"}
@@ -73,7 +73,7 @@ dated:
   - {date: 2023-06-28, name: Idd-ul-Azha, status: confirmed, source: "NSE data"}
   - {date: 2024-06-17, name: Idd-ul-Azha, status: confirmed, source: "NSE data; Idd fell on Sunday 16 Jun"}
   - {date: 2025-06-06, name: Idd-ul-Azha, status: confirmed, source: "NSE data; officeholidays.com"}
-  - {date: 2026-05-27, name: Idd-ul-Azha, status: listed, source: "officeholidays.com 2026"}
+  - {date: 2026-05-27, name: Idd-ul-Azha, status: confirmed, source: "NSE data; officeholidays.com"}
 
 # One-off gazetted closures. Reasons come from public reporting; the date is what matters.
 closures:

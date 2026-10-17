@@ -1,4 +1,5 @@
-"""Builds, validates and uploads static API releases.
+"""Stage 5, publish (§13): validated static JSON for the web app. Never imports the ML layer."""
 
-Implemented in phase 9 (ENGINEERING.md section 34).
-"""
+from nsefc.publishing.build import Publisher, PublishError, PublishInputs, publish
+
+__all__ = ["PublishError", "PublishInputs", "Publisher", "publish"]

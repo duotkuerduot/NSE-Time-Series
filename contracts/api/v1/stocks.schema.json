@@ -128,5 +128,5 @@
   "title": "StocksIndex",
   "type": "object",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://nsefc.local/contracts/api/v1/stocks.schema.json"
+  "$id": "https://github.com/duotkuerduot/NSE-Time-Series/contracts/api/v1/stocks.schema.json"
 }

@@ -1,0 +1,23 @@
+# The test suite's overlay: the sample's periods with one thread, for determinism checks.
+periods:
+  tuning: ["2016-01-01", "2016-12-31"]
+  selection: ["2018-01-01", "2020-12-31"]
+  holdout_start: "2021-01-01"
+  calibration_warmup_sessions: 250
+
+universe:
+  min_history: 250
+
+profiles:
+  default:
+    refit: semiannual
+    candidates: [ridge, huber, lightgbm]
+    tune: false
+  full:
+    refit: annual
+    candidates: [ridge, huber, lightgbm]
+    tune: true
+    trials: 2
+
+runtime:
+  threads: 1

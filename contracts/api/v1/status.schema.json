@@ -1,5 +1,102 @@
 {
   "$defs": {
+    "DatasetInfo": {
+      "additionalProperties": false,
+      "description": "Where the data came from, for the header, footer and About page (v1.1).",
+      "properties": {
+        "source": {
+          "enum": [
+            "mendeley",
+            "local",
+            "sample"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "version": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Version"
+        },
+        "first_session": {
+          "format": "date",
+          "title": "First Session",
+          "type": "string"
+        },
+        "last_session": {
+          "format": "date",
+          "title": "Last Session",
+          "type": "string"
+        },
+        "licence": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Licence"
+        },
+        "citation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Citation"
+        },
+        "doi": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Doi"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Url"
+        }
+      },
+      "required": [
+        "source",
+        "title",
+        "version",
+        "first_session",
+        "last_session",
+        "licence",
+        "citation",
+        "doi",
+        "url"
+      ],
+      "title": "DatasetInfo",
+      "type": "object"
+    },
     "ModelRef": {
       "additionalProperties": false,
       "properties": {
@@ -83,17 +180,16 @@
           "title": "Finished At"
         },
         "primary_source": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
+          "enum": [
+            "mendeley",
+            "local",
+            "sample"
           ],
-          "title": "Primary Source"
+          "title": "Primary Source",
+          "type": "string"
         },
         "fallback_used": {
+          "description": "Always false in local mode",
           "title": "Fallback Used",
           "type": "boolean"
         },
@@ -120,12 +216,18 @@
     }
   },
   "additionalProperties": false,
-  "description": "Mutable pointer to the current release. Cached for 60 seconds (22.2).",
+  "description": "Pointer to the current release, plus run and data status (§13.3).",
   "properties": {
     "api_version": {
       "const": "1",
       "default": "1",
       "title": "Api Version",
+      "type": "string"
+    },
+    "contract_version": {
+      "const": "1.1",
+      "default": "1.1",
+      "title": "Contract Version",
       "type": "string"
     },
     "release_id": {
@@ -150,10 +252,30 @@
       "type": "string"
     },
     "stale_after": {
-      "description": "When the next release is due; past this time the frontend shows the stale banner",
-      "format": "date-time",
-      "title": "Stale After",
+      "anyOf": [
+        {
+          "description": "ISO 8601 with offset, e.g. ...Z",
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "When the next release is due; null in local mode, where data is never late",
+      "title": "Stale After"
+    },
+    "data_mode": {
+      "enum": [
+        "historical",
+        "historical+imports",
+        "sample"
+      ],
+      "title": "Data Mode",
       "type": "string"
+    },
+    "dataset": {
+      "$ref": "#/$defs/DatasetInfo"
     },
     "pipeline": {
       "$ref": "#/$defs/PipelineStatus"
@@ -178,11 +300,14 @@
   },
   "required": [
     "api_version",
+    "contract_version",
     "release_id",
     "generated_at",
     "latest_session",
     "next_session",
     "stale_after",
+    "data_mode",
+    "dataset",
     "pipeline",
     "champion",
     "notices"
@@ -190,5 +315,5 @@
   "title": "Status",
   "type": "object",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://nsefc.local/contracts/api/v1/status.schema.json"
+  "$id": "https://github.com/duotkuerduot/NSE-Time-Series/contracts/api/v1/status.schema.json"
 }

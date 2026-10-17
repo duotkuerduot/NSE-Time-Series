@@ -1,4 +1,5 @@
-"""Data-quality check suite, gate decision and reports (ENGINEERING.md section 10).
+"""Data-quality checks (§6.6)."""
 
-Implemented in phase 1 (ENGINEERING.md section 34).
-"""
+from nsefc.quality.checks import CheckResult, DataQualityError, errors, missing_ranges
+
+__all__ = ["CheckResult", "DataQualityError", "errors", "missing_ranges"]

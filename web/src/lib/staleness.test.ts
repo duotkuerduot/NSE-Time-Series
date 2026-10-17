@@ -8,4 +8,8 @@ describe("staleness", () => {
     expect(isStale(status, new Date("2026-10-08T18:59:59Z"))).toBe(false);
     expect(isStale(status, new Date("2026-10-08T19:00:01Z"))).toBe(true);
   });
+
+  it("is never stale in local mode, where stale_after is null", () => {
+    expect(isStale({ stale_after: null }, new Date("2030-01-01T00:00:00Z"))).toBe(false);
+  });
 });

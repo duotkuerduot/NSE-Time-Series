@@ -1,0 +1,26 @@
+{
+  "ticker": "KUKZ",
+  "name": "Kakuzi Plc",
+  "sector": "Agricultural",
+  "segment": null,
+  "status": "active",
+  "latest": {
+    "session": "2025-10-31",
+    "close": 420.17,
+    "prev_close": 420.17,
+    "change": 0.0,
+    "change_pct": 0.0,
+    "volume": 0,
+    "turnover": null
+  },
+  "range_52w": {
+    "low": 413.69,
+    "high": 462.03
+  },
+  "price_basis": "vwap",
+  "flags": {
+    "suspended": false,
+    "corporate_action_today": false,
+    "ex_dividend_today": false
+  }
+}

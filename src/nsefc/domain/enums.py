@@ -14,7 +14,10 @@ class PriceBasis(StrEnum):
 
 
 class Severity(StrEnum):
+    """Data-quality severities (§6.6): error blocks the run, exclude drops rows from modelling."""
+
     ERROR = "error"
+    EXCLUDE = "exclude"
     WARN = "warn"
     INFO = "info"
 
@@ -79,6 +82,7 @@ class UnavailableReason(StrEnum):
     DATA_QUALITY_HOLD = "DATA_QUALITY_HOLD"
     PIPELINE_DELAYED = "PIPELINE_DELAYED"
     MODEL_UNAVAILABLE = "MODEL_UNAVAILABLE"
+    RECENT_PRICE_EVENT = "RECENT_PRICE_EVENT"  # a band-breaching move inside the gap-guard window
 
 
 class DirectionOutcome(StrEnum):
@@ -87,18 +91,37 @@ class DirectionOutcome(StrEnum):
     NO_CHANGE = "no_change"
 
 
-class RunType(StrEnum):
-    DAILY = "daily"
-    REFIT = "refit"
-    COMPETITION = "competition"
-    BACKFILL = "backfill"
-    AUDIT = "audit"
-    DRYRUN = "dryrun"
-    SPIKE = "spike"
+class DataMode(StrEnum):
+    """What the published results are built from (status.json, contract v1.1)."""
+
+    HISTORICAL = "historical"
+    HISTORICAL_WITH_IMPORTS = "historical+imports"
+    SAMPLE = "sample"
 
 
-class Environment(StrEnum):
-    DEVELOPMENT = "development"
-    CI = "ci"
-    DRYRUN = "dryrun"
-    PRODUCTION = "production"
+class SourceKind(StrEnum):
+    """Where raw files came from (§5): the manifest's ``source`` field."""
+
+    MENDELEY = "mendeley"
+    LOCAL = "local"
+    SAMPLE = "sample"
+    USER_IMPORT = "user_import"
+
+
+class InstrumentType(StrEnum):
+    """Only ordinary shares enter the forecast universe (§6.5, §13.1)."""
+
+    ORDINARY = "ordinary"
+    PREFERENCE = "preference"
+    RIGHTS = "rights"
+    ETF = "etf"
+    REIT = "reit"
+    INDEX = "index"
+
+
+class SessionStatus(StrEnum):
+    """A weekday in ``sessions.parquet`` (§6.1, §7)."""
+
+    HELD = "held"
+    MISSING = "missing"
+    HOLIDAY = "holiday"

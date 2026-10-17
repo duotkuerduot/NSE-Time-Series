@@ -2,21 +2,19 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
-// Every page renders from the fixtures and has no serious or critical WCAG 2.1 AA problems
-// (ENGINEERING.md 24.9, 28.2).
+// Against the contract fixtures (vite preview): every page renders and has no serious or
+// critical WCAG 2.1 AA problems (ENGINEERING.md §16.4).
 const PAGES = [
   { path: "/", heading: "Find an NSE stock", text: "Biggest gainers" },
   { path: "/stocks/SCOM", heading: "Safaricom PLC", text: "80% expected range" },
-  { path: "/stocks/KUKZ", heading: "Kakuzi Plc", text: "trades too rarely" },
+  { path: "/stocks/KUKZ", heading: "Kakuzi Plc", text: "Forecasts cover ordinary shares" },
   { path: "/stocks/UCHM", heading: "Uchumi Supermarket Plc", text: "suspended" },
-  { path: "/about", heading: "How the forecasts work", text: "not investment advice" },
+  { path: "/about", heading: "How the forecasts work", text: "Every model, through the same gates" },
   { path: "/no-such-page", heading: "This page does not exist.", text: "NSE Forecast" },
 ];
 
-async function seriousViolations(page: Page): Promise<string[]> {
-  const results = await new AxeBuilder({ page })
-    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
-    .analyze();
+export async function seriousViolations(page: Page): Promise<string[]> {
+  const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
   return results.violations
     .filter((v) => v.impact === "serious" || v.impact === "critical")
     .map((v) => `${v.id} (${v.nodes.length}): ${v.help}`);

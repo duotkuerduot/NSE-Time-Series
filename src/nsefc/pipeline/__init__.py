@@ -1,4 +1,7 @@
-"""Orchestrates stages for daily, refit, competition and backfill runs.
+"""Runs the stages in order with caching (ENGINEERING.md §19).
 
-Implemented in phase 8-11 (ENGINEERING.md section 34).
+acquire -> ingest -> train (and evaluate) -> predict -> publish. Each stage fingerprints its
+inputs, skips itself when its stamp in ``data/stamps/`` matches, writes its outputs to a
+temporary folder and swaps them into place, and logs to ``data/runs/<run_id>/log.jsonl``.
+Only the CLI imports this package.
 """

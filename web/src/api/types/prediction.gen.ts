@@ -44,9 +44,17 @@ export type GeneratedAt = string
 export type DataThrough = string
 export type IsLate = boolean
 /**
+ * True when the target session is before today on the user's machine
+ */
+export type TargetInPast = boolean
+/**
+ * False when the calendar does not cover the target: it is the next weekday
+ */
+export type TargetFromCalendar = boolean
+/**
  * Why a security has no forecast in a release (ENGINEERING.md 22.3).
  */
-export type UnavailableReason = ("NOT_IN_FORECAST_UNIVERSE" | "INSUFFICIENT_HISTORY" | "SUSPENDED" | "DATA_QUALITY_HOLD" | "PIPELINE_DELAYED" | "MODEL_UNAVAILABLE")
+export type UnavailableReason = ("NOT_IN_FORECAST_UNIVERSE" | "INSUFFICIENT_HISTORY" | "SUSPENDED" | "DATA_QUALITY_HOLD" | "PIPELINE_DELAYED" | "MODEL_UNAVAILABLE" | "RECENT_PRICE_EVENT")
 export type Basis = ("live" | "backtest")
 export type WindowSessions = number
 export type N = number
@@ -106,6 +114,8 @@ model: ModelRef
 generated_at: GeneratedAt
 data_through: DataThrough
 is_late: IsLate
+target_in_past: TargetInPast
+target_from_calendar: TargetFromCalendar
 }
 export interface ForecastRange {
 level: Level

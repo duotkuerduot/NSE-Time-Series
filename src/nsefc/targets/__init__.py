@@ -1,4 +1,5 @@
-"""Target definitions: the only module allowed to look forward in time.
+"""Targets (§9): next-session returns. Imports nothing from features (rule L2)."""
 
-Implemented in phase 4 (ENGINEERING.md section 34).
-"""
+from nsefc.targets.labels import next_session_labels, winsorise
+
+__all__ = ["next_session_labels", "winsorise"]

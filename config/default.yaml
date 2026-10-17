@@ -1,0 +1,105 @@
+# NSE Forecast: every tunable setting (ENGINEERING.md §14). Unknown keys are errors.
+# `--sample` loads config/sample.yaml over this file; the test suite loads config/test.yaml.
+# Times and dates are quoted so YAML reads them as strings, not numbers.
+
+paths:
+  data_dir: data            # NSEFC_DATA_DIR overrides this
+
+dataset:
+  # The data ships in the repository's "NSE Data/" folder; its citation and folder name are
+  # in reference/mendeley.yaml. Nothing is downloaded (§5, owner decision D-10).
+  citation_file: reference/mendeley.yaml
+
+calendar:
+  holidays_file: config/calendar/nse_holidays.yaml
+
+quality:
+  band: 0.10                # NSE main-board daily price band (Rules 5.10; Phase 0 A5)
+  event_margin: 0.005       # a move beyond band + 0.5 pp is an event (§6.7)
+  mkt_min_share: 0.70       # MKT-01: securities in a session vs trailing median
+  mkt_window: 20
+  vwap_tolerance: 0.02      # VOL-01: |turnover / volume / close - 1| above this warns
+
+features:
+  returns: [1, 2, 3, 5, 10, 20]
+  sma: [5, 20, 50]
+  high_low_window: 250
+  volatility_windows: [5, 20]
+  ewma_lambda: 0.94
+  liquidity_window: 20
+  market_returns: [1, 5]
+  max_lookback: 60          # gap guard window (§8.4); the 250-session features become null
+
+targets:
+  winsorise: 0.105          # training labels only; evaluation is never winsorised
+
+universe:
+  window: 250               # held sessions looked back over
+  min_traded_share: 0.80
+  min_median_turnover_kes: 150000   # tuned in Phase 4 for 16-29 securities (§22 D-13)
+  min_history: 500
+  # Ordinary shares only: rights (-R), preference shares (-P4, -P7), ETFs and REITs are
+  # listed in reference/securities.csv with their instrument type.
+
+periods:
+  tuning: ["2013-01-01", "2017-12-31"]
+  selection: ["2018-01-01", "2022-12-31"]
+  holdout_start: "2023-01-01"
+  calibration_warmup_sessions: 250   # walk-forward starts this many sessions before selection
+
+evaluation:
+  dm_lags: 5
+  flat_threshold: 0.001     # a forecast within ±0.1% is "no change" for direction metrics
+
+intervals:
+  level: 0.80
+  ewma_lambda: 0.94
+  sigma_floor: 0.0025
+  calibration_window: 250
+
+gates:
+  skill_min: 0.01
+  skill_p_max: 0.05
+  base_p_max: 0.10
+  stab_min_positive_share: 0.80   # 4 of 5 selection years
+  stab_year_floor: -0.02
+  dir_alpha: 0.05
+  cal_low: 0.75
+  cal_high: 0.85
+  hold_min_ratio: 0.50
+  plaus_skill_max: 0.15
+  plaus_direction_max: 0.65
+
+profiles:
+  default:
+    refit: quarterly
+    candidates: [ridge, huber, lightgbm]
+    tune: false
+  full:
+    refit: monthly
+    candidates: [ridge, huber, lightgbm, catboost]
+    tune: true
+    trials: 40
+
+models:
+  b1_window: 250
+  b2_window: 5
+  b3_window: 500
+  early_stopping_share: 0.10
+
+publishing:
+  movers_count: 5
+  movers_min_turnover_kes: 100000   # movers must have traded at least this much value
+  history_rows: 250                 # holdout predictions listed per stock (§13.3 item 2)
+  index_trend_sessions: 250
+  breadth_sessions: 60
+  track_record_window: 60
+
+serve:
+  host: 127.0.0.1
+  port: 8000
+  port_tries: 10
+
+runtime:
+  threads: 4
+  seed: 20261016

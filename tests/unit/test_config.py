@@ -1,153 +1,102 @@
+"""Layered settings (§14): default.yaml, a profile overlay, NSEFC_DATA_DIR, then overrides."""
+
 from __future__ import annotations
 
-import shutil
-from datetime import time
 from pathlib import Path
 
 import pytest
 import yaml
 
-from nsefc.config import ConfigError, load_settings, redacted, settings_hash
-from nsefc.domain import Environment
+from nsefc.config import ConfigError, find_project_root, load_settings
 
 
-@pytest.fixture
-def config_dir(repo_root: Path) -> Path:
-    return repo_root / "config"
+@pytest.mark.parametrize("profile", ["default", "sample", "test"])
+def test_every_profile_loads(repo_root: Path, profile: str) -> None:
+    settings = load_settings(profile, project_root=repo_root, environ={})  # type: ignore[arg-type]
+    assert settings.profile_name == profile
+    assert set(settings.model_specs) == {"ridge", "huber", "lightgbm", "catboost"}
+    assert settings.profiles["default"].tune is False
+    assert settings.profiles["full"].tune is True
 
 
-@pytest.mark.parametrize("env", list(Environment))
-def test_every_environment_loads(config_dir: Path, env: Environment) -> None:
-    settings = load_settings(env, config_dir=config_dir, environ={})
-    assert settings.env is env
+def test_sample_profile_shortens_the_periods(repo_root: Path) -> None:
+    default = load_settings("default", project_root=repo_root, environ={})
+    sample = load_settings("sample", project_root=repo_root, environ={})
+    assert default.periods.holdout_start.year == 2023
+    assert sample.periods.holdout_start.year == 2021
+    assert sample.universe.min_history < default.universe.min_history
 
 
-def test_production_rules(config_dir: Path) -> None:
-    production = load_settings("production", config_dir=config_dir, environ={})
-    assert production.storage.backend == "r2"
-    assert production.providers.chain == ["nse_pricelist", "kingdom"]
-    dryrun = load_settings("dryrun", config_dir=config_dir, environ={})
-    assert dryrun.storage.read_only
+def test_paths_resolve_against_the_project_root(repo_root: Path) -> None:
+    settings = load_settings("default", project_root=repo_root, environ={})
+    assert settings.data_dir == repo_root / "data"
+    assert settings.citation_file == repo_root / "reference" / "mendeley.yaml"
+    assert settings.holidays_file.is_file()
+    assert settings.site_file.is_file()
 
 
-def test_environment_variable_override(config_dir: Path) -> None:
+def test_data_dir_environment_override(repo_root: Path, tmp_path: Path) -> None:
     settings = load_settings(
-        "development",
-        config_dir=config_dir,
-        environ={
-            "NSEFC__PIPELINE__FRESHNESS_DEADLINE_EAT": "21:30",
-            "NSEFC__PUBLISHING__MOVERS_COUNT": "7",
-        },
+        "default", project_root=repo_root, environ={"NSEFC_DATA_DIR": str(tmp_path)}
     )
-    assert settings.pipeline.freshness_deadline_eat == time(21, 30)
-    assert settings.publishing.movers_count == 7
+    assert settings.data_dir == tmp_path
 
 
-def test_cli_override_wins(config_dir: Path) -> None:
+def test_overrides_win(repo_root: Path) -> None:
     settings = load_settings(
-        "development",
-        config_dir=config_dir,
-        environ={"NSEFC__REFIT__SCHEDULE": "weekly"},
-        overrides={"refit.schedule": "daily"},
+        "default", project_root=repo_root, environ={}, overrides={"universe.min_history": 300}
     )
-    assert settings.refit.schedule == "daily"
+    assert settings.universe.min_history == 300
 
 
-def test_unknown_key_is_rejected(config_dir: Path) -> None:
+def test_unknown_key_is_an_error(repo_root: Path) -> None:
     with pytest.raises(ConfigError, match="extra"):
         load_settings(
-            "development",
-            config_dir=config_dir,
-            environ={"NSEFC__PIPELINE__FRESHNES_DEADLINE": "22:00"},
+            "default", project_root=repo_root, environ={}, overrides={"universe.colour": "red"}
         )
 
 
-def test_invalid_value_is_rejected(config_dir: Path) -> None:
+@pytest.mark.parametrize(
+    ("key", "value"),
+    [
+        ("features.max_lookback", 20),  # must exceed the longest window
+        ("periods.holdout_start", "2019-01-01"),  # inside the selection period
+        ("quality.band", 2.0),
+        ("gates.plaus_direction_max", 1.5),
+    ],
+)
+def test_invalid_values_are_errors(repo_root: Path, key: str, value: object) -> None:
     with pytest.raises(ConfigError):
-        load_settings(
-            "development",
-            config_dir=config_dir,
-            environ={"NSEFC__PROVIDERS__POLITENESS__MIN_SECONDS_BETWEEN_REQUESTS": "0.1"},
-        )
+        load_settings("default", project_root=repo_root, environ={}, overrides={key: value})
 
 
-def test_unknown_environment(config_dir: Path) -> None:
-    with pytest.raises(ConfigError, match="unknown environment"):
-        load_settings("staging", config_dir=config_dir, environ={})
-
-
-def test_secrets_never_from_files(tmp_path: Path, config_dir: Path) -> None:
-    for name in ("base.yaml", "providers.yaml", "development.yaml"):
-        shutil.copy(config_dir / name, tmp_path / name)
-    with (tmp_path / "development.yaml").open("a") as handle:
-        handle.write("\nsecrets:\n  r2_access_key_id: leaked\n")
-    with pytest.raises(ConfigError, match="secrets"):
-        load_settings("development", config_dir=tmp_path, environ={})
-
-
-def test_secrets_redacted_and_excluded_from_hash(config_dir: Path) -> None:
-    plain = load_settings("development", config_dir=config_dir, environ={})
-    with_secret = load_settings(
-        "development", config_dir=config_dir, environ={"NSEFC_R2_ACCESS_KEY_ID": "AKIA-very-secret"}
+def test_section_hash_tracks_only_its_sections(repo_root: Path) -> None:
+    base = load_settings("default", project_root=repo_root, environ={})
+    changed = load_settings(
+        "default", project_root=repo_root, environ={}, overrides={"gates.skill_min": 0.02}
     )
-    dumped = redacted(with_secret)
-    assert dumped["secrets"]["r2_access_key_id"] == "***"
-    assert "AKIA-very-secret" not in str(dumped)
-    assert settings_hash(plain) == settings_hash(with_secret)
+    assert base.section_hash("features") == changed.section_hash("features")
+    assert base.section_hash("gates") != changed.section_hash("gates")
 
 
-def test_chain_must_name_known_providers(tmp_path: Path, config_dir: Path) -> None:
-    for name in ("base.yaml", "providers.yaml", "development.yaml"):
-        shutil.copy(config_dir / name, tmp_path / name)
-    (tmp_path / "development.yaml").write_text(yaml.safe_dump({"providers": {"chain": ["nope"]}}))
-    with pytest.raises(ConfigError, match="unknown providers"):
-        load_settings("development", config_dir=tmp_path, environ={})
+def test_every_config_file_is_valid_yaml(repo_root: Path) -> None:
+    for path in (repo_root / "config").rglob("*.yaml"):
+        assert yaml.safe_load(path.read_text(encoding="utf-8")) is not None, path
 
 
-def test_every_config_file_is_valid_yaml(config_dir: Path) -> None:
-    for path in config_dir.rglob("*.yaml"):
-        assert isinstance(yaml.safe_load(path.read_text()), dict), path
+def test_model_files_freeze_values_and_bound_searches(repo_root: Path) -> None:
+    settings = load_settings("default", project_root=repo_root, environ={})
+    lightgbm = settings.model_specs["lightgbm"]
+    assert lightgbm.frozen["objective"] == "l1"
+    for name, space in lightgbm.search.items():
+        assert "choices" in space or space["low"] < space["high"], name
 
 
-def test_champion_pointer_shape(config_dir: Path) -> None:
-    champion = yaml.safe_load((config_dir / "champion.yaml").read_text())
-    assert set(champion) == {"champion", "artifact_sha256", "previous_champion"}
+def test_project_root_is_found_from_a_subfolder(repo_root: Path) -> None:
+    assert find_project_root(repo_root / "src" / "nsefc") == repo_root
 
 
-def test_list_override_as_json(config_dir: Path) -> None:
-    settings = load_settings(
-        "development", config_dir=config_dir, environ={"NSEFC__PROVIDERS__CHAIN": '["kingdom"]'}
-    )
-    assert settings.providers.chain == ["kingdom"]
-
-
-def test_unquoted_yaml_time_is_rejected(tmp_path: Path, config_dir: Path) -> None:
-    for name in ("base.yaml", "providers.yaml"):
-        shutil.copy(config_dir / name, tmp_path / name)
-    (tmp_path / "development.yaml").write_text("pipeline:\n  freshness_deadline_eat: 22:00\n")
-    with pytest.raises(ConfigError, match="quoted"):
-        load_settings("development", config_dir=tmp_path, environ={})
-
-
-def test_validation_errors_never_echo_secrets(config_dir: Path) -> None:
-    environ = {
-        "NSEFC_R2_ACCESS_KEY_ID": "AKIDEXAMPLEKEYID",
-        "NSEFC_R2_SECRET_ACCESS_KEY": "wJalrXUtnFEMI-K7MDENG-bPxRfiCYEXAMPLEKEY",
-        "NSEFC_HEALTHCHECK_URL": "https://hc-ping.com/0f6a-secret-uuid",
-        "NSEFC__STORAGE__BACKEND": "local",  # production requires r2: a whole-settings error
-    }
-    with pytest.raises(ConfigError) as caught:
-        load_settings("production", config_dir=config_dir, environ=environ)
-    message = f"{caught.value}\n{caught.value.__cause__}"
-    assert "requires" in message or "r2" in message
-    for fragment in ("EXAMPLEKEY", "secret-uuid", "AKIDEXAMPLE"):
-        assert fragment not in message
-
-
-def test_malformed_json_override_is_a_config_error(config_dir: Path) -> None:
-    with pytest.raises(ConfigError, match="NSEFC__PROVIDERS__CHAIN: not valid JSON"):
-        load_settings(
-            "development",
-            config_dir=config_dir,
-            environ={"NSEFC__PROVIDERS__CHAIN": '["kingdom",'},
-        )
+def test_no_secrets_or_cloud_settings_remain(repo_root: Path) -> None:
+    text = (repo_root / "config" / "default.yaml").read_text(encoding="utf-8").lower()
+    for word in ("r2", "secret", "token", "bucket", "production"):
+        assert f"{word}:" not in text, word
