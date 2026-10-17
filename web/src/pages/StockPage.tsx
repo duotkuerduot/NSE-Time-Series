@@ -42,17 +42,17 @@ function PredictionPanel({
   const t = data.track_record;
   const holdout = report?.periods.holdout;
   return (
-    <div>
-      <h2>
+    <div className="forecast">
+      <h3 className="label">
         {COPY.forecastFor(f.target_session)}
-        {!f.target_from_calendar && <span className="meta"> · {COPY.nextWeekday}</span>}
-      </h2>
+        {!f.target_from_calendar && <span> · {COPY.nextWeekday}</span>}
+      </h3>
       {f.target_in_past && <p className="meta">{COPY.targetInPast(f.data_through)}</p>}
-      <p>
-        {COPY.forecastClose} <span className="big model">{formatKes(f.predicted_close)}</span>{" "}
+      <p className="forecast-close">
+        <span className="meta">{COPY.forecastClose}</span> <span className="big model">{formatKes(f.predicted_close)}</span>{" "}
         <span className="model">({forecastChangeText(f.predicted_return)})</span>
       </p>
-      <p>
+      <p className="forecast-range">
         {COPY.expectedRange}:{" "}
         <span className="model">
           {formatKes(f.range.lower)} to {formatPrice(f.range.upper)}
@@ -99,15 +99,17 @@ export function StockPage() {
   const holdout = report.data?.periods.holdout;
   return (
     <>
-      <section>
+      <section className="stock-head">
         {s ? (
           <>
+            <p className="label">{[s.ticker, s.sector, s.segment].filter(Boolean).join(", ")}</p>
             <h1>{s.name}</h1>
-            <p className="meta">{[s.ticker, s.sector, s.segment].filter(Boolean).join(", ")}</p>
             {s.latest && (
-              <p>
+              <p className="price-line">
                 <span className="big">{formatKes(s.latest.close)}</span>{" "}
-                {formatSignedPrice(s.latest.change)} (<ChangeValue fraction={s.latest.change_pct} />){" "}
+                <span className="price-change">
+                  {formatSignedPrice(s.latest.change)} (<ChangeValue fraction={s.latest.change_pct} />)
+                </span>{" "}
                 <span className="meta">{COPY.closeOn(s.latest.session)}</span>
               </p>
             )}
@@ -119,63 +121,67 @@ export function StockPage() {
           </p>
         )}
       </section>
-      <Section title="Price history" isPending={history.isPending} error={history.error} onRetry={() => void history.refetch()}>
-        {h && h.dates.length > 0 && (
-          <>
-            <LineChart
-              label={`${ticker} official closing price over the past year${latest ? ", with the next-session forecast and its 80% range" : ""}`}
-              dates={h.dates}
-              series={[{ label: "Official close", values: h.close, tone: "ink" }]}
-              markers={moves}
-              range={latest ? { lower: latest.range.lower, upper: latest.range.upper, point: latest.predicted_close } : undefined}
-              format={formatPrice}
-            />
-            <p>
-              {h.dates.length} sessions from {formatSessionDate(h.dates[0] ?? "")} to{" "}
-              {formatSessionDate(h.dates[h.dates.length - 1] ?? "")}. 52-week range{" "}
-              {s?.range_52w ? `${formatPrice(s.range_52w.low)} to ${formatPrice(s.range_52w.high)}` : "n/a"}.
-            </p>
-            {gapStarts(h.dates).map((i) => (
-              <p key={h.dates[i]} className="meta">
-                {COPY.dataGap(h.dates[i - 1] ?? "", h.dates[i] ?? "")}
+      <div className="stock-grid">
+        <Section title="Price history" isPending={history.isPending} error={history.error} onRetry={() => void history.refetch()}>
+          {h && h.dates.length > 0 && (
+            <>
+              <LineChart
+                label={`${ticker} official closing price over the past year${latest ? ", with the next-session forecast and its 80% range" : ""}`}
+                dates={h.dates}
+                series={[{ label: "Official close", values: h.close, tone: "ink" }]}
+                markers={moves}
+                range={latest ? { lower: latest.range.lower, upper: latest.range.upper, point: latest.predicted_close } : undefined}
+                format={formatPrice}
+              />
+              <p>
+                {h.dates.length} sessions from {formatSessionDate(h.dates[0] ?? "")} to{" "}
+                {formatSessionDate(h.dates[h.dates.length - 1] ?? "")}. 52-week range{" "}
+                {s?.range_52w ? `${formatPrice(s.range_52w.low)} to ${formatPrice(s.range_52w.high)}` : "n/a"}.
               </p>
-            ))}
-            {moves.length > 0 && <p className="meta">{COPY.largeMoves(moves.length)}</p>}
-          </>
-        )}
-      </Section>
-      <Section title="Forecast" isPending={prediction.isPending} error={prediction.error} onRetry={() => void prediction.refetch()}>
-        {prediction.data && <PredictionPanel data={prediction.data} report={report.data} stock={s} />}
-      </Section>
+              {gapStarts(h.dates).map((i) => (
+                <p key={h.dates[i]} className="meta">
+                  {COPY.dataGap(h.dates[i - 1] ?? "", h.dates[i] ?? "")}
+                </p>
+              ))}
+              {moves.length > 0 && <p className="meta">{COPY.largeMoves(moves.length)}</p>}
+            </>
+          )}
+        </Section>
+        <Section title="Forecast" isPending={prediction.isPending} error={prediction.error} onRetry={() => void prediction.refetch()}>
+          {prediction.data && <PredictionPanel data={prediction.data} report={report.data} stock={s} />}
+        </Section>
+      </div>
       {rows.length > 0 && (
         <Section title={COPY.historyTitle} isPending={false} error={null} onRetry={() => undefined}>
           {holdout && <p className="meta">{COPY.backtestLabel(formatPeriod(holdout.start, holdout.end))}. Most recent first.</p>}
-          <table>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th className="num">Forecast</th>
-                <th className="num">Range</th>
-                <th className="num">Actual</th>
-                <th className="num">Miss</th>
-                <th>Direction</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r) => (
-                <tr key={r.target_session}>
-                  <td>{formatSessionDate(r.target_session, false)}</td>
-                  <td className="num model">{formatPrice(r.predicted_close)}</td>
-                  <td className="num model">
-                    {formatPrice(r.lower)}–{formatPrice(r.upper)}
-                  </td>
-                  <td className="num">{r.actual_close != null ? formatPrice(r.actual_close) : "—"}</td>
-                  <td className="num">{r.error_pct != null ? formatPct(r.error_pct, 1) : "—"}</td>
-                  <td>{r.direction ? COPY.direction[r.direction] : "—"}</td>
+          <div className="table-scroll" role="region" aria-label={COPY.historyTitle} tabIndex={0}>
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th className="num">Forecast</th>
+                  <th className="num">Range</th>
+                  <th className="num">Actual</th>
+                  <th className="num">Miss</th>
+                  <th>Direction</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {rows.map((r) => (
+                  <tr key={r.target_session}>
+                    <td>{formatSessionDate(r.target_session, false)}</td>
+                    <td className="num model">{formatPrice(r.predicted_close)}</td>
+                    <td className="num model">
+                      {formatPrice(r.lower)}–{formatPrice(r.upper)}
+                    </td>
+                    <td className="num">{r.actual_close != null ? formatPrice(r.actual_close) : "—"}</td>
+                    <td className="num">{r.error_pct != null ? formatPct(r.error_pct, 1) : "—"}</td>
+                    <td>{r.direction ? COPY.direction[r.direction] : "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
           <p className="meta">Volume on the latest session: {s?.latest ? formatInt(s.latest.volume) : "n/a"} shares.</p>
         </Section>
       )}

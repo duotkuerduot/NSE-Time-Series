@@ -1,30 +1,105 @@
-/* Visual tokens (ENGINEERING.md 24.8). Colour carries meaning only: green and red for actual
-   price changes, blue for model output, ink for actual prices and text. */
-:root {
-  --bg: #ffffff;
-  --surface: #f4f6f5;
-  --ink: #15201c;
-  --ink-2: #4a5752;
-  --gain: #0f7a3d;
-  --loss: #b3261e;
-  --model: #2d4cb0;
-  --rule: #8a9590; /* decorative only: below 3:1 on --surface (review) */
-  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px;
-  color-scheme: light dark;
+/* Design tokens (docs/design/redesign.md). Colour carries meaning only: deep blue is model
+   output, green and red are actual price changes, ink is actual prices and text, and the rule
+   colour is decoration (dividers, gridlines), never text or a control's border.
+
+   Inter Tight ExtraBold for headlines and the two hero numbers, Inter for everything else; both
+   self-hosted (SIL OFL 1.1, see assets/fonts/), so the app works offline. */
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../assets/fonts/inter-latin-400-normal.woff2") format("woff2");
 }
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("../assets/fonts/inter-latin-600-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Inter Tight";
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("../assets/fonts/inter-tight-latin-800-normal.woff2") format("woff2");
+}
+
+/* Light (the default) */
+:root {
+  --bg: #f6f1e7; /* cream */
+  --surface: #ece4d4;
+  --ink: #141414;
+  --ink-2: #4d483f;
+  --model: #1b3a7a; /* deep blue: model output only */
+  --gain: #1e6b3a;
+  --loss: #a3311d;
+  --rule: #9c9483; /* decorative only: 2.7:1 on --bg */
+  --model-wash: rgb(27 58 122 / 0.28); /* the 80% range band */
+  color-scheme: light;
+}
+
+/* Dark follows the system setting, with its own measured values (not an inversion). */
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #101a17;
-    --surface: #17241f;
-    --ink: #e8eeeb;
-    --ink-2: #a7b4ae;
-    --gain: #5bd38a;
-    --loss: #ff8a80;
-    --model: #9db3ff;
-    --rule: #5e6b66;
+    --bg: #121110; /* warm black */
+    --surface: #1d1b18;
+    --ink: #f2ebdd;
+    --ink-2: #b5ad9d;
+    --model: #93b2ff;
+    --gain: #6fcb91;
+    --loss: #ff907b;
+    --rule: #6b6559;
+    --model-wash: rgb(147 178 255 / 0.3);
+    color-scheme: dark;
   }
 }
+
+:root {
+  /* Type (the owner's choice): Inter Tight ExtraBold for headlines and the two hero numbers
+     (the current price and the forecast close), Inter for body text, with the system sans as
+     the fallback for both. */
+  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: "Inter Tight", Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font: var(--font-sans);
+  --fw-display: 800;
+
+  /* Size / line height, on a 4px grid */
+  --fs-figure: 56px; --lh-figure: 60px; /* hero numbers */
+  --fs-title: 44px; --lh-title: 52px; /* page titles */
+  --fs-h2: 24px; --lh-h2: 32px;
+  --fs-h3: 18px; --lh-h3: 28px;
+  --fs-body: 16px; --lh-body: 24px;
+  --fs-small: 14px; --lh-small: 20px;
+  --fs-label: 12px; --lh-label: 16px;
+
+  /* Space, on a 4px grid */
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px;
+  --s6: 32px; --s7: 48px; --s8: 64px; --s9: 96px;
+
+  --page: 1120px; /* content width */
+  --measure: 68ch; /* text columns stay under 80 characters */
+  --target: 44px; /* minimum touch target */
+  --radius: 999px; /* pills: buttons and the search field */
+  --radius-s: 4px;
+
+  /* Motion: short, and only in response to the user */
+  --dur: 150ms;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+}
+
+@media (max-width: 600px) {
+  :root {
+    --fs-figure: 44px; --lh-figure: 48px;
+    --fs-title: 34px; --lh-title: 40px;
+    --fs-h2: 22px; --lh-h2: 28px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  * { transition: none !important; animation: none !important; }
+  *, *::before, *::after {
+    transition: none !important;
+    animation: none !important;
+  }
 }

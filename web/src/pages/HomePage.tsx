@@ -46,25 +46,27 @@ export function HomePage() {
 
   return (
     <>
-      <section>
+      <section className="hero">
         <StockSearch autoFocus asHeading />
         {data && (
-          <p>
+          <p className="market-line">
             {data.summary.nasi && (
-              <>
-                NASI {formatPrice(data.summary.nasi.level)} <ChangeValue fraction={data.summary.nasi.change_pct} />
-                {"  "}
-              </>
+              <span>
+                NASI {formatPrice(data.summary.nasi.level)} <ChangeValue fraction={data.summary.nasi.change_pct} />{" "}
+              </span>
             )}
             {data.summary.nse20 && (
-              <>
-                NSE 20 {formatPrice(data.summary.nse20.level)} <ChangeValue fraction={data.summary.nse20.change_pct} />
-                {"  "}
-              </>
+              <span>
+                NSE 20 {formatPrice(data.summary.nse20.level)} <ChangeValue fraction={data.summary.nse20.change_pct} />{" "}
+              </span>
             )}
-            {data.summary.advancers} up, {data.summary.decliners} down, {data.summary.unchanged} flat. Turnover{" "}
-            {formatCompactKes(data.summary.turnover_kes)}
-            {data.summary.turnover_vs_20d != null && ` (${data.summary.turnover_vs_20d.toFixed(1)}× 20-day average)`}
+            <span>
+              {data.summary.advancers} up, {data.summary.decliners} down, {data.summary.unchanged} flat.{" "}
+            </span>
+            <span>
+              Turnover {formatCompactKes(data.summary.turnover_kes)}
+              {data.summary.turnover_vs_20d != null && ` (${data.summary.turnover_vs_20d.toFixed(1)}× 20-day average)`}
+            </span>
           </p>
         )}
       </section>

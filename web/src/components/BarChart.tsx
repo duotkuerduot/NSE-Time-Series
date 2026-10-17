@@ -22,7 +22,10 @@ export function BarChart({ label, items, format }: Props) {
             <div className="bar-col" key={item.label} aria-hidden="true">
               <div className="bar-area">
                 <div className="zero" style={{ top: `${pct(0)}%` }} />
-                <div className="bar" style={{ top: `${start}%`, height: `max(${size}%, 1px)` }} />
+                <div
+                  className={item.value < 0 ? "bar neg" : "bar"}
+                  style={{ top: `${start}%`, height: `max(${size}%, 1px)` }}
+                />
                 <span
                   className="bar-value"
                   style={item.value < 0 ? { top: `calc(${start + size}% + 2px)` } : { top: `calc(${start}% - 18px)` }}

@@ -51,42 +51,44 @@ function Headline({ report }: { report: Report }) {
 function GateTable({ report }: { report: Report }) {
   return (
     <>
-      <table>
-        <thead>
-          <tr>
-            <th>Model</th>
-            <th className="num">Selection skill</th>
-            <th className="num">DM p</th>
-            <th className="num">Holdout skill</th>
-            <th className="num">In 80% range</th>
-            <th>Gates</th>
-          </tr>
-        </thead>
-        <tbody>
-          {report.models.map((m) => {
-            const failed = m.gates.filter((g) => !g.passed);
-            return (
-              <tr key={m.model_id}>
-                <td>
-                  {m.label}
-                  {m.is_champion && <strong> (champion)</strong>}
-                </td>
-                <td className="num">{skill(m.selection.skill)}</td>
-                <td className="num">{m.model_id === "B0" ? "—" : pValue(m.selection.dm_p)}</td>
-                <td className="num">{skill(m.holdout?.skill)}</td>
-                <td className="num">{share(m.selection.coverage)}</td>
-                <td>
-                  {m.gates.length === 0
-                    ? "Reference"
-                    : failed.length === 0
-                      ? `All ${m.gates.length} passed`
-                      : `${m.gates.length - failed.length} of ${m.gates.length} passed`}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+      <div className="table-scroll" role="region" aria-label="Every model, through the same gates" tabIndex={0}>
+        <table>
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th className="num">Selection skill</th>
+              <th className="num">DM p</th>
+              <th className="num">Holdout skill</th>
+              <th className="num">In 80% range</th>
+              <th>Gates</th>
+            </tr>
+          </thead>
+          <tbody>
+            {report.models.map((m) => {
+              const failed = m.gates.filter((g) => !g.passed);
+              return (
+                <tr key={m.model_id}>
+                  <td>
+                    {m.label}
+                    {m.is_champion && <strong> (champion)</strong>}
+                  </td>
+                  <td className="num">{skill(m.selection.skill)}</td>
+                  <td className="num">{m.model_id === "B0" ? "—" : pValue(m.selection.dm_p)}</td>
+                  <td className="num">{skill(m.holdout?.skill)}</td>
+                  <td className="num">{share(m.selection.coverage)}</td>
+                  <td>
+                    {m.gates.length === 0
+                      ? "Reference"
+                      : failed.length === 0
+                        ? `All ${m.gates.length} passed`
+                        : `${m.gates.length - failed.length} of ${m.gates.length} passed`}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
       <p className="meta">
         Skill is 1 − (model’s average miss ÷ no-change guess’s average miss), measured on the selection period (
         {formatPeriod(report.periods.selection.start, report.periods.selection.end)}) unless marked holdout. Positive means the
@@ -169,9 +171,9 @@ export function AboutPage() {
   const dataset = status.data?.dataset;
   return (
     <>
-      <section>
+      <section className="intro">
         <h1>How the forecasts work</h1>
-        <p>
+        <p className="lead">
           NSE Forecast estimates the next session’s official closing price for the most actively traded stocks on the Nairobi
           Securities Exchange, with an 80% expected range. Everything runs on your own computer: one command reads the
           historical dataset, checks and cleans it, trains and tests the models, picks a champion by fixed rules and serves
@@ -196,6 +198,8 @@ export function AboutPage() {
           mechanical carry-over from one day to the next. A per-stock AR(1) model measures that effect, and a model has to
           beat it, not just the no-change guess, to show it adds something.
         </p>
+      </section>
+      <section>
         <h2>Method</h2>
         <ol>
           <li>Acquire: copy the dataset files and record their SHA-256 hashes.</li>
@@ -217,6 +221,8 @@ export function AboutPage() {
           </li>
           <li>Predict and publish: the champion forecasts the next session and this app reads the results.</li>
         </ol>
+      </section>
+      <section>
         <h2>Limitations</h2>
         <ul>
           <li>
@@ -237,6 +243,8 @@ export function AboutPage() {
           </li>
           <li>Past results do not predict future results. {COPY.disclaimer}</li>
         </ul>
+      </section>
+      <section>
         <h2>Data</h2>
         {dataset?.citation ? (
           <p>

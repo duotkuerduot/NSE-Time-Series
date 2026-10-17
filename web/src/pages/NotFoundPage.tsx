@@ -6,7 +6,9 @@ export function NotFoundPage() {
     <section>
       <h1>{COPY.pageNotFound}</h1>
       <p>
-        <Link to="/">Go to the homepage</Link>
+        <Link to="/" className="btn btn-secondary">
+          Go to the homepage
+        </Link>
       </p>
     </section>
   );

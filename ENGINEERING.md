@@ -623,7 +623,7 @@ links:
 
 ## 15. Frontend (minimal changes)
 
-The existing app, its pages, components, design tokens, accessibility work and tests stay. Only these changes are made.
+The existing app, its pages, components, design tokens, accessibility work and tests stay. Only these changes are made. On 17 October 2026 the owner also asked for a visual redesign (D-42, `docs/design/redesign.md`), which changed the styling only.
 
 ### 15.1 Data access
 
@@ -879,6 +879,7 @@ Checks: CI is green on all three operating systems; a fresh clone in a new folde
 | D-39 | The "sign of the last return" rule in G-DIR is scored only on rows where it makes a call (the last return was non-zero), as models are | Counting its non-calls as misses understated it by up to 8 points and favoured the models; a metric correction found in review, not a threshold change. No gate outcome on the real data changed |
 | D-40 | Prices in `prediction.json` are derived from the rounded last close; a stock outside the forecast universe is told which rules decide membership, and a security with no recent prices is described as no longer quoted | Keeps every published forecast valid against the contract for any source precision, and replaces a reason ("trades too rarely") that was wrong for most such stocks |
 | D-41 | Dataset CSVs are copied and hashed with Windows line endings (CRLF) converted to LF | Git stores the files with LF (`.gitattributes`), but the Mendeley downloads and the owner's Windows checkout have CRLF, so the same file had two SHA-256 values. Corrections are keyed by hash (§6.4), so on the owner's machine they would not have applied and ingest would have stopped on the misdated blocks (found at delivery) |
+| D-42 | Visual redesign at the owner's request: cream, near-black and deep blue tokens (`web/src/styles/tokens.css`), Inter Tight ExtraBold for headlines and the two hero numbers, Inter for everything else, three self-hosted woff2 files (SIL OFL 1.1). Routes, data fetching, the contract, component logic and page content are unchanged | The owner likes the calm, big-type style of tihada.com. `docs/design/redesign.md` records the qualities taken from it, the measured contrast ratios (all text at least 5.2:1), the font licences and the checks (axe in both modes at 1440px and 360px) |
 
 Add new decisions here during implementation, one short paragraph each.
 
