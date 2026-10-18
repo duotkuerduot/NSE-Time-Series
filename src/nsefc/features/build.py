@@ -1,4 +1,4 @@
-"""Feature set v1 (§8.2) and the gap guard (§8.4).
+"""Feature set v1 and the gap guard.
 
 One code path for training and prediction: ``build(panel)`` returns one row per (ticker,
 session) with every feature as of that session. Every input is scale-free (returns, ratios,
@@ -113,7 +113,7 @@ def _sessions_since_trade(traded: np.ndarray, pos: np.ndarray, cap: int) -> np.n
 def window_flags(panel: Panel, window: int) -> np.ndarray:
     """True where the last ``window`` rows of the ticker hold no missing session and no event.
 
-    This is the gap guard (§8.4): a missing session between the first and last row of the
+    This is the gap guard: a missing session between the first and last row of the
     window, or a PRC-01 event anywhere in it, invalidates the row.
     """
     bars = panel.bars

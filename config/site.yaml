@@ -1,5 +1,5 @@
-# Shown in the app's footer and About page, and in the README's Contact section (§14, §18).
-# Filled in by the owner. Links may be https://, http:// or mailto: addresses.
+# Who built this copy of NSE Forecast: shown in the app's footer and About page, and in the
+# README's Contact section. Links may be https://, http:// or mailto: addresses.
 owner_name: "Duot Kuer"
 tagline: "Built by Duot Kuer"
 links:

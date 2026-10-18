@@ -169,7 +169,7 @@ def test_forecast_consistency_allows_rounding(
             v1.StockPrediction.model_validate(data)
 
 
-# ---------------------------------------------------------------- contract v1.1 (§13.3)
+# ---------------------------------------------------------------- contract v1.1
 @pytest.mark.parametrize(
     ("path", "model"),
     [

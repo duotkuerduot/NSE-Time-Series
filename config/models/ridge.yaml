@@ -1,13 +1,12 @@
-# M1 Ridge regression (§10.2): median imputation, in-fold winsorisation and scaling, then Ridge.
+# Ridge regression: median imputation, in-fold winsorisation and scaling, then Ridge.
 label: "Ridge regression"
-# Tuned on the tuning period only (2013-2017, 40 Optuna trials, `nsefc dev tune`, 16 Oct 2026)
-# but NOT active: on data to Oct 2025 the default run with these values stopped at G-PLAUS
-# (LightGBM holdout directional accuracy 66.1% > 65%); with the 2026 files it passes at
-# 64.8% and the champion is unchanged. The owner decides (ENGINEERING.md §22 D-30); to use
-# them, replace the `frozen:` block below.
+# Values tuned on the tuning period only (2013 to 2017, 40 Optuna trials, `nsefc dev tune`).
+# They are not active: with them, LightGBM's directional calls on the holdout come within 0.2
+# percentage points of the plausibility tripwire, and the champion is the same
+# (docs/decisions.md). To use them, replace the `frozen:` block below.
 # frozen:
 #   alpha: 97.81
 frozen:
   alpha: 1.0
-search:                      # full profile only, tuned on the tuning period (§11.2)
+search:                      # full profile only, tuned on the tuning period
   alpha: {low: 0.001, high: 100.0, log: true}

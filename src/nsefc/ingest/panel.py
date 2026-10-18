@@ -1,4 +1,4 @@
-"""Panel rules (§6.3): classify sessions from observed rows first, then synthesise.
+"""Panel rules: classify sessions from observed rows first, then synthesise.
 
 1. A security is listed from its first to its last appearance in the data.
 2. Market-level checks run first, on observed rows only: a scheduled session with no rows for
@@ -27,7 +27,7 @@ def classify_sessions(
     """Every weekday in [first, last] as held, missing or holiday.
 
     ``observed`` counts securities with a source row per date. Returns the sessions frame and
-    the dates with data that the calendar closes (DAT-02; data wins for history, §7).
+    the dates with data that the calendar closes (DAT-02; for history, the data wins).
     """
     counts = observed.to_dict()
     records = []

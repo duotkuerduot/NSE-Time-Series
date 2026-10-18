@@ -1,4 +1,4 @@
-# Tests only (ENGINEERING.md §17): no secrets, no data downloads, no schedules. Every
+# Tests only: no secrets, no data downloads, no schedules. Every
 # third-party action is pinned to a commit SHA (tests/unit/test_repository.py checks this).
 name: ci
 
@@ -99,7 +99,7 @@ jobs:
         run: pnpm audit --audit-level high
 
   browser:
-    # Sample run, the local server, then Playwright with axe against it (§16.5), plus the
+    # Sample run, the local server, then Playwright with axe against it, plus the
     # fixture smoke test.
     runs-on: ubuntu-latest
     timeout-minutes: 25

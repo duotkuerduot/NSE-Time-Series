@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
 // Against the contract fixtures (vite preview): every page renders and has no serious or
-// critical WCAG 2.1 AA problems (ENGINEERING.md §16.4).
+// critical WCAG 2.1 AA problems.
 const PAGES = [
   { path: "/", heading: "Find an NSE stock", text: "Biggest gainers" },
   { path: "/stocks/SCOM", heading: "Safaricom PLC", text: "80% expected range" },

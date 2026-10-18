@@ -223,7 +223,7 @@
           "title": "In Range"
         },
         "model_id": {
-          "description": "The model that made this forecast (review FE-4)",
+          "description": "The model that made this forecast",
           "title": "Model Id",
           "type": "string"
         }
@@ -317,7 +317,7 @@
       "type": "object"
     },
     "UnavailableReason": {
-      "description": "Why a security has no forecast in a release (ENGINEERING.md 22.3).",
+      "description": "Why a security has no forecast in a release (API contract v1).",
       "enum": [
         "NOT_IN_FORECAST_UNIVERSE",
         "INSUFFICIENT_HISTORY",

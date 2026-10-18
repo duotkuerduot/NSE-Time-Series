@@ -1,4 +1,4 @@
-"""Baselines (§10.1) and the candidate pipelines (§10.2)."""
+"""Baselines and the candidate pipelines."""
 
 from __future__ import annotations
 

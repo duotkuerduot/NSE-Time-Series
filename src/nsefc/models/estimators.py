@@ -1,11 +1,11 @@
-"""Baselines and candidate models behind one small interface (§10).
+"""Baselines and candidate models behind one small interface.
 
 Every model is a *global* forecaster of next-session simple returns, fitted on a training
 frame and asked for predictions on a test frame. The frames carry the feature columns plus a
 few helper columns computed as of each row (``b1_drift``, ``x_ret``), so baselines and ML
 models run in exactly the same harness and can all become champion.
 
-Determinism: fixed seeds, fixed thread counts, rows sorted before fitting, CPU only (§10.2).
+Determinism: fixed seeds, fixed thread counts, rows sorted before fitting, CPU only.
 """
 
 from __future__ import annotations
@@ -52,7 +52,7 @@ class Forecaster:
         raise NotImplementedError
 
 
-# ---------------------------------------------------------------- baselines (§10.1)
+# ---------------------------------------------------------------- baselines
 @dataclass
 class NoChange(Forecaster):
     name: ClassVar[str] = "B0"
@@ -128,7 +128,7 @@ class AR1(Forecaster):
         return (a.astype(float) + b.astype(float) * x).to_numpy(dtype=float)
 
 
-# ---------------------------------------------------------------- linear models (M1)
+# ---------------------------------------------------------------- linear models
 class Winsoriser(BaseEstimator, TransformerMixin):  # type: ignore[misc]
     """Clip each column to its training 1st and 99th percentiles (fitted in-fold, rule L4)."""
 
@@ -196,7 +196,7 @@ class RidgeModel(Forecaster):
 
 @dataclass
 class HuberModel(RidgeModel):
-    """The Huber variant of M1: robust loss, closer to a conditional median."""
+    """The Huber variant of the linear model: robust loss, closer to a conditional median."""
 
     name: ClassVar[str] = "huber"
 
@@ -208,7 +208,7 @@ class HuberModel(RidgeModel):
         )
 
 
-# ---------------------------------------------------------------- trees (M2, M3)
+# ---------------------------------------------------------------- gradient-boosted trees
 def _split_for_early_stopping(
     train: pd.DataFrame, share: float
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
@@ -331,7 +331,7 @@ CANDIDATES: dict[str, type[Forecaster]] = {
 
 
 def family_rank(model_id: str) -> int:
-    """Simpler first: baseline < linear < LightGBM < CatBoost (tie-break order, §11.5)."""
+    """Simpler first: baseline < linear < LightGBM < CatBoost (the tie-break order)."""
     if model_id in BASELINES:
         return FAMILY_ORDER["baseline"]
     return FAMILY_ORDER[CANDIDATES[model_id].family]

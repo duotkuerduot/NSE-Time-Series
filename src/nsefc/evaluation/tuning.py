@@ -1,9 +1,9 @@
-"""Hyperparameter tuning for the full profile (§11.1, §11.2): Optuna TPE on the tuning period.
+"""Hyperparameter tuning for the full profile: Optuna TPE on the tuning period.
 
 Expanding-window annual folds: for each year in the tuning period, fit on every labelled row
 before 1 January and score the year's out-of-sample MAE. The objective is the mean over
 folds. Tuning-period results are never used for selection; the tuned values are written to
-the evaluation report so a maintainer can freeze them in config/models/ (§10.2).
+the evaluation report so a maintainer can freeze them in config/models/.
 """
 
 from __future__ import annotations

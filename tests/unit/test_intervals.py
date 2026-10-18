@@ -1,4 +1,4 @@
-"""Volatility-scaled split conformal intervals (§12)."""
+"""Volatility-scaled split conformal intervals."""
 
 from __future__ import annotations
 

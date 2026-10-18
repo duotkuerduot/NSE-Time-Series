@@ -1,11 +1,11 @@
-// All number and date formatting lives here (ENGINEERING.md 23.4). Session dates are plain
+// All number and date formatting lives here. Session dates are plain
 // local dates ("2026-10-07") and are formatted in UTC so no time zone can shift them a day.
 
 const MINUS = "−";
 const kes2 = new Intl.NumberFormat("en-KE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const int = new Intl.NumberFormat("en-KE", { maximumFractionDigits: 0 });
 
-export const NO_CHANGE_BAND = 0.001; // ±0.1%: "≈ no change" (24.5)
+export const NO_CHANGE_BAND = 0.001; // ±0.1%: "≈ no change"
 
 export function formatPrice(value: number): string {
   return kes2.format(value);
@@ -33,7 +33,7 @@ export function formatPct(fraction: number, digits = 2): string {
   return `${fraction > 0 ? "+" : MINUS}${text}%`;
 }
 
-/** Colour is never the only cue: a change always carries an arrow and a sign (24.8). */
+/** Colour is never the only cue: a change always carries an arrow and a sign. */
 export function formatChange(fraction: number): { text: string; direction: "up" | "down" | "flat" } {
   const text = formatPct(fraction);
   if (text.startsWith("+")) return { text: `▲ ${text}`, direction: "up" };

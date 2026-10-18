@@ -1,4 +1,4 @@
-"""Gates and champion selection (§11.4, §11.5). Thresholds are fixed before results are seen.
+"""Gates and champion selection. Thresholds are fixed before results are seen.
 
 A model's *selection* metrics decide every gate except G-HOLD, which uses the holdout only to
 confirm. G-PLAUS stops the run: results far better than plausible are treated as a leakage
@@ -182,7 +182,7 @@ def choose_champion(
     *,
     paired_p: Callable[[str, str], float],
 ) -> Choice:
-    """§11.5: the best gated ML candidate; else the best gated simple baseline; else B0."""
+    """The best gated ML candidate; else the best gated simple baseline; else B0."""
     candidates = [a for a in assessments if not a.is_baseline and a.passes()]
     if candidates:
         candidates.sort(key=lambda a: a.selection.mae)

@@ -1,4 +1,4 @@
-"""Determinism and artifact integrity (§10.2, §10.3, §16.2)."""
+"""Determinism and artifact integrity."""
 
 from __future__ import annotations
 

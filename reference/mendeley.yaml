@@ -1,14 +1,12 @@
-# The dataset this tool uses, and how to cite it (ENGINEERING.md §5, owner decision D-10).
+# The dataset NSE Forecast reads, and how to cite it. The run summary, the app and the README
+# show this citation.
 #
-# The data is NOT downloaded. The repository's "NSE Data/" folder holds the daily price files
-# from the Mendeley Data series "Nairobi Securities Exchange (NSE) All Stocks Prices"
-# (2007-01-02 to 2026-06-30; see docs/data/mendeley-dataset.md). The citation below is the
-# one the owner asked the app, README and run summary to show.
+# The files are not in the repository: download them from Mendeley Data and place them in
+# data/source/ (data/README.md lists the collections and files). Nothing is downloaded at run
+# time.
 #
-# licence: left empty until someone checks the dataset page. While it is empty the run
-# summary says the data is for personal research use (§5.3). Fill it in (for example
-# "CC BY 4.0") and add `licence_url` once confirmed.
-folder: NSE Data
+# licence and licence_url are shown next to the citation (for example "CC BY 4.0" and its
+# URL). Left empty, the run summary and the app say the data is for personal research use.
 dataset:
   id: hvmhnp7f9r
   version: 1

@@ -9,7 +9,7 @@ export type Links = SiteLink[]
 export type Attribution = string
 
 /**
- * Owner name and contact links from config/site.yaml, plus dataset attribution.
+ * The builder's name and contact links from config/site.yaml, plus dataset attribution.
  */
 export interface Site {
 owner_name: OwnerName

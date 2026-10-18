@@ -1,4 +1,4 @@
-"""Raw-data manifests (§5.2): which files were copied or generated, from where, and their hashes."""
+"""Raw-data manifests: which files were copied or generated, from where, and their hashes."""
 
 from __future__ import annotations
 

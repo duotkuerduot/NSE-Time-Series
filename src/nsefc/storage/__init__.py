@@ -1,4 +1,4 @@
-"""Local files only (§6.1): hashing, atomic writes, atomic folder swaps and Parquet tables."""
+"""Local files only: hashing, atomic writes, atomic folder swaps and Parquet tables."""
 
 from nsefc.storage.files import (
     UnsafePathError,

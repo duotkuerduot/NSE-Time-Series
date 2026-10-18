@@ -1,4 +1,4 @@
-"""Leakage rules L1-L3 and the gap guard (§8.3, §8.4, §16.2).
+"""Leakage rules L1-L3 and the gap guard.
 
 Features at session T may use only data up to T: truncating the data at T, or changing every
 row after T, must leave them exactly unchanged, and nothing may cross from one security to the

@@ -1,4 +1,4 @@
-"""Repository rules (§4, §17, AC-04, AC-12)."""
+"""Repository rules: one test-only CI workflow, pinned actions, and no data in git."""
 
 from __future__ import annotations
 
@@ -67,51 +67,60 @@ def test_the_pin_check_sees_flow_style() -> None:
     assert list(uses(flow)) == ["actions/checkout@v4"]
 
 
-def test_gitignore_keeps_derived_data_out(repo_root: Path) -> None:
+def git(repo_root: Path, *args: str) -> subprocess.CompletedProcess[str]:
+    if shutil.which("git") is None:
+        pytest.skip("git is not installed")
+    result = subprocess.run(
+        ["git", *args], cwd=repo_root, capture_output=True, text=True, check=False
+    )
+    if result.returncode == 128:
+        pytest.skip("not a git checkout")
+    return result
+
+
+def tracked(repo_root: Path, *pathspec: str) -> list[str]:
+    """Files git tracks, leaving out those already deleted from the working tree."""
+    listed = git(repo_root, "ls-files", "-z", "--", *pathspec).stdout.split("\0")
+    deleted = set(git(repo_root, "ls-files", "-z", "--deleted", "--", *pathspec).stdout.split("\0"))
+    return [name for name in listed if name and name not in deleted]
+
+
+def test_gitignore_keeps_data_out(repo_root: Path) -> None:
     lines = (repo_root / ".gitignore").read_text(encoding="utf-8").splitlines()
     assert "data/*" in lines and "!data/.gitkeep" in lines and "!data/README.md" in lines
-    assert not any(line.strip().rstrip("/") == "NSE Data" for line in lines)  # D-10: committed
-    assert (repo_root / "data" / ".gitkeep").is_file() and (
-        repo_root / "data" / "README.md"
-    ).is_file()
+    assert "data/source/*" in lines and "!data/source/README.md" in lines
+    for kept in ("data/.gitkeep", "data/README.md", "data/source/README.md"):
+        assert (repo_root / kept).is_file(), kept
 
 
-@pytest.mark.skipif(shutil.which("git") is None, reason="git is not installed")
 def test_nothing_under_data_is_tracked(repo_root: Path) -> None:
-    result = subprocess.run(
-        ["git", "ls-files", "--", "data"],
-        cwd=repo_root,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    if result.returncode != 0:
-        pytest.skip("not a git checkout")
-    tracked = set(result.stdout.split())
-    assert tracked <= {"data/.gitkeep", "data/README.md"}
+    assert set(tracked(repo_root, "data")) <= {
+        "data/.gitkeep",
+        "data/README.md",
+        "data/source/README.md",
+    }
 
 
-def test_the_dataset_ships_with_its_citation(repo_root: Path) -> None:
-    files = list((repo_root / "NSE Data").rglob("NSE_data_all_stocks_*.csv"))
-    assert len(files) == 20  # 2007 to June 2026, one price file per year
-    citation = "Wanjawa, Barack (2026)"
-    for path in ("README.md", "reference/mendeley.yaml", "docs/data/mendeley-dataset.md"):
-        assert citation in (repo_root / path).read_text(encoding="utf-8"), path
-
-
-def test_draft_one_cloud_material_is_gone(repo_root: Path) -> None:
-    for gone in (
-        "deploy",
-        "migrations",
-        "research",
-        ".env.example",
-        "Claude outputs",
-        ".github/workflows/source-spike.yml",
-        "src/nsefc/storage/objectstore.py",
+def test_dataset_files_are_ignored(repo_root: Path) -> None:
+    for probe in (
+        "data/source/NSE_data_all_stocks_2026_upto_jun.csv",
+        "data/source/Collection 2026/NSE_data_stock_market_sectors_2026.csv",
+        "data/source/hvmhnp7f9r-1.zip",
     ):
-        assert not (repo_root / gone).exists(), gone
-    assert (repo_root / "docs" / "archive" / "ENGINEERING-draft-1.0.md").is_file()
-    assert (repo_root / "docs" / "adr" / "ADR-017-local-first.md").is_file()
+        assert git(repo_root, "check-ignore", "-q", "--no-index", probe).returncode == 0, probe
+
+
+def test_no_dataset_file_is_tracked(repo_root: Path) -> None:
+    """Only the small synthetic fixture: the Mendeley files are downloaded, not committed."""
+    assert tracked(repo_root, "*NSE_data_*") == [
+        "tests/fixtures/historical/NSE_data_all_stocks_2099_sample.csv"
+    ]
+
+
+def test_the_citation_is_shown_where_the_data_is_described(repo_root: Path) -> None:
+    citation = "Wanjawa, Barack (2026)"
+    for path in ("README.md", "reference/mendeley.yaml", "data/README.md"):
+        assert citation in (repo_root / path).read_text(encoding="utf-8"), path
 
 
 def test_readme_has_the_results_markers_and_a_licence(repo_root: Path) -> None:
@@ -119,3 +128,12 @@ def test_readme_has_the_results_markers_and_a_licence(repo_root: Path) -> None:
     assert "<!-- results:start -->" in readme and "<!-- results:end -->" in readme
     assert "uv run nsefc run" in readme
     assert (repo_root / "LICENSE").is_file()
+
+
+def test_the_package_version_matches_pyproject(repo_root: Path) -> None:
+    import tomllib
+
+    from nsefc import __version__
+
+    project = tomllib.loads((repo_root / "pyproject.toml").read_text(encoding="utf-8"))
+    assert project["project"]["version"] == __version__

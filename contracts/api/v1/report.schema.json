@@ -182,7 +182,7 @@
       "additionalProperties": false,
       "properties": {
         "id": {
-          "description": "Gate id from ENGINEERING.md §11.4, e.g. G-SKILL",
+          "description": "Gate id, e.g. G-SKILL (docs/methodology.md, Gates)",
           "title": "Id",
           "type": "string"
         },
@@ -422,7 +422,7 @@
     }
   },
   "additionalProperties": false,
-  "description": "Evaluation results for the About page (§13.3 item 4).",
+  "description": "Evaluation results for the About page.",
   "properties": {
     "profile": {
       "enum": [

@@ -52,7 +52,7 @@ export type TargetInPast = boolean
  */
 export type TargetFromCalendar = boolean
 /**
- * Why a security has no forecast in a release (ENGINEERING.md 22.3).
+ * Why a security has no forecast in a release (API contract v1).
  */
 export type UnavailableReason = ("NOT_IN_FORECAST_UNIVERSE" | "INSUFFICIENT_HISTORY" | "SUSPENDED" | "DATA_QUALITY_HOLD" | "PIPELINE_DELAYED" | "MODEL_UNAVAILABLE" | "RECENT_PRICE_EVENT")
 export type Basis = ("live" | "backtest")
@@ -91,7 +91,7 @@ export type ErrorPct = (number | null)
 export type DirectionOutcome = ("hit" | "miss" | "no_change")
 export type InRange = (boolean | null)
 /**
- * The model that made this forecast (review FE-4)
+ * The model that made this forecast
  */
 export type ModelId1 = string
 export type History = PredictionHistoryRow[]

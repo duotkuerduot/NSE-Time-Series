@@ -1,7 +1,7 @@
 """Generate the fixture release in contracts/api/v1/fixtures (illustrative values only).
 
-Contract v1.1 (ENGINEERING.md §13.3). Dates come from the real trading calendar and mirror the
-dataset's end (Fri 31 Oct 2025, forecast for Mon 3 Nov 2025); prices, volumes, forecasts and
+Contract v1.1. Dates come from the real trading calendar (the release ends on Fri 31 Oct 2025,
+with a forecast for Mon 3 Nov 2025); prices, volumes, forecasts and
 evaluation results are a seeded random walk, not market data or real results. Every file is
 built through the contract models, so the fixtures are valid by construction, and
 `uv run nsefc dev contract --validate contracts/api/v1/fixtures` re-checks them in CI. The web

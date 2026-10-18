@@ -1,9 +1,9 @@
-"""The forward forecast (§11.2 "Forecast", §12, §13.1).
+"""The forward forecast.
 
 The champion, refitted on all labelled data, forecasts the session after the last data date
 for every security in the forecast universe at that date. Its 80% range is calibrated on the
 champion's own most recent 250 sessions of out-of-sample walk-forward predictions. Every
-universe security gets a forecast or a reason why not (AC-09).
+universe security gets a forecast or a reason why not.
 """
 
 from __future__ import annotations

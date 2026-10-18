@@ -1,4 +1,4 @@
-"""Prediction intervals (§12): volatility-scaled split conformal, 80% level."""
+"""Prediction intervals: volatility-scaled split conformal, 80% level."""
 
 from nsefc.intervals.conformal import (
     floor_sigma,

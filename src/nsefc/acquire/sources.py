@@ -1,13 +1,13 @@
-"""Stage 1, acquire (§5): where the raw files come from. Nothing is downloaded.
+"""Stage 1, acquire: where the raw files come from. Nothing is downloaded.
 
-* default: the repository's ``NSE Data/`` folder, the Mendeley Data price files, cited as
-  recorded in ``reference/mendeley.yaml`` (owner decision D-10);
-* ``--source-dir PATH``: any folder of files in the same format (§5.4);
-* ``--sample``: the deterministic synthetic dataset (§16.3).
+* default: ``data/source/``, where the Mendeley Data price files are placed by hand, cited as
+  recorded in ``reference/mendeley.yaml``;
+* ``--source-dir PATH``: any folder of files in the same format;
+* ``--sample``: the deterministic synthetic dataset.
 
 The chosen files are copied once into ``data/raw/`` with a manifest of SHA-256 hashes, so
-every canonical row traces to an exact file (G-5) and later edits to the source folder are
-noticed: a changed file gets a new manifest and the next ingest re-runs.
+every canonical row traces to an exact file and later edits to the source folder are noticed:
+a changed file gets a new manifest and the next ingest re-runs.
 """
 
 from __future__ import annotations
@@ -53,11 +53,14 @@ class AcquireError(RuntimeError):
     """The dataset could not be read (exit code 10)."""
 
 
+class SourceMissingError(AcquireError):
+    """The source folder does not exist or holds no dataset files."""
+
+
 @dataclass(frozen=True, slots=True)
 class Citation:
     """The dataset's identity and attribution, from reference/mendeley.yaml."""
 
-    folder: str
     dataset_id: str
     version: int
     title: str
@@ -76,7 +79,6 @@ def load_citation(path: Path) -> Citation:
         data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
         dataset = data["dataset"]
         return Citation(
-            folder=str(data.get("folder", "NSE Data")),
             dataset_id=str(dataset["id"]),
             version=int(dataset["version"]),
             title=str(dataset["title"]),
@@ -109,12 +111,12 @@ def _lf(data: bytes) -> bytes:
 
 
 def content_sha256(path: Path) -> str:
-    """The SHA-256 that identifies a source file, as its copy will have it (D-41).
+    """The SHA-256 that identifies a source file, as its copy will have it.
 
-    CSV text is hashed with Windows line endings read as LF. Git stores the dataset with LF
-    (``.gitattributes``), while the Mendeley downloads and older Windows checkouts have CRLF;
-    without this the same file would hash differently on the owner's machine, and corrections
-    keyed by hash (§6.4) would silently not apply.
+    CSV text is hashed with Windows line endings read as LF. Downloaded copies can have CRLF
+    line endings while other copies of the same files have LF; without this one file would
+    hash differently from one machine to the next, and corrections keyed by hash would
+    silently not apply.
     """
     if path.suffix.lower() in TEXT_SUFFIXES:
         return sha256_bytes(_lf(path.read_bytes()))
@@ -139,7 +141,7 @@ def _flat_name(relative: str, taken: set[str]) -> str:
     """The file's own name, made unique with a short hash if another file already has it.
 
     Raw copies sit directly in their folder: the source's nested folder names are long, and a
-    Windows path longer than 260 characters cannot be created (§3.4, AC-01).
+    Windows path longer than 260 characters cannot be created.
     """
     base = PurePosixPath(relative).name
     name = base if base not in taken else f"{sha256_text(relative)[:8]}-{base}"
@@ -180,18 +182,16 @@ def extract_zip(path: Path, folder: Path, taken: set[str] | None = None) -> list
 
 
 def _source_files(source_dir: Path) -> list[Path]:
+    """The .csv and .zip files under ``source_dir``; anything else (a README) is ignored."""
     if not source_dir.is_dir():
-        raise AcquireError(
-            f"{source_dir} is not a folder. Use --source-dir PATH for another folder of dataset "
-            "files, or --sample for the synthetic sample."
-        )
+        raise SourceMissingError(f"{source_dir} is not a folder")
     files = sorted(
         p
         for p in source_dir.rglob("*")
         if p.is_file() and p.suffix.lower() in COPIED_SUFFIXES and not p.name.startswith(".")
     )
     if not files:
-        raise AcquireError(f"no .csv or .zip files under {source_dir}")
+        raise SourceMissingError(f"no .csv or .zip files in {source_dir}")
     return files
 
 
@@ -237,9 +237,14 @@ def _copy_folder(
     return AcquireResult(mode, [manifest_path], copied=True)
 
 
-def acquire_dataset(raw_root: Path, project_root: Path, citation: Citation) -> AcquireResult:
-    """The default: the repository's dataset folder, recorded with its citation."""
-    source_dir = project_root / citation.folder
+def acquire_dataset(
+    raw_root: Path, source_dir: Path, citation: Citation, *, origin: str | None = None
+) -> AcquireResult:
+    """The default: the Mendeley files in ``source_dir``, recorded with their citation.
+
+    ``origin`` is how the manifest names the folder (``data/source``, say); it defaults to the
+    folder's path.
+    """
     destination = raw_root / "mendeley" / citation.dataset_id / f"v{citation.version}"
     fields: dict[str, object] = {
         "source": SourceKind.MENDELEY,
@@ -250,13 +255,13 @@ def acquire_dataset(raw_root: Path, project_root: Path, citation: Citation) -> A
         "licence_url": citation.licence_url,
         "doi": citation.doi,
         "citation": citation.text,
-        "origin": citation.folder,
+        "origin": origin or source_dir.as_posix(),
     }
     return _copy_folder(raw_root, source_dir, destination, fields)
 
 
 def acquire_local(raw_root: Path, source_dir: Path) -> AcquireResult:
-    """``--source-dir``: any folder of files in the dataset's format (§5.4)."""
+    """``--source-dir``: any folder of files in the dataset's format."""
     source_dir = Path(source_dir).expanduser()
     fields: dict[str, object] = {
         "source": SourceKind.LOCAL,

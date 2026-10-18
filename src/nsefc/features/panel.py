@@ -1,4 +1,4 @@
-"""The only door into the data for feature code (leakage rule L1, §8.3).
+"""The only door into the data for feature code (leakage rule L1).
 
 ``load_panel(..., as_of=T)`` keeps rows with ``session_date <= T`` and asserts it, so a
 feature can only ever see the past. ``Panel`` also carries the per-row bookkeeping that the

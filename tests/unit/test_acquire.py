@@ -1,4 +1,4 @@
-"""Acquire (§5.2, §16.1): copy, hash, cache, and refuse unsafe or missing input."""
+"""Acquire: copy, hash, cache, and refuse unsafe or missing input."""
 
 from __future__ import annotations
 
@@ -34,34 +34,34 @@ CITATION = (
 
 
 def make_folder(root: Path) -> Path:
-    folder = root / "NSE Data" / "part"
+    folder = root / "source" / "part"
     folder.mkdir(parents=True)
     (folder / "NSE_data_all_stocks_2099.csv").write_text(
         "Date,Code\n2-Jan-99,AAA\n", encoding="utf-8"
     )
     (folder / "notes.txt").write_text("ignored", encoding="utf-8")
-    return root / "NSE Data"
+    return root / "source"
 
 
-def test_the_committed_citation_is_the_owners_choice(repo_root: Path) -> None:
+def test_the_citation_names_the_2026_collection(repo_root: Path) -> None:
     citation = load_citation(repo_root / "reference" / "mendeley.yaml")
     assert citation.text == CITATION
     assert citation.doi == "10.17632/hvmhnp7f9r.1"
-    assert citation.folder == "NSE Data"
     assert (citation.dataset_id, citation.version) == ("hvmhnp7f9r", 1)
-    assert citation.licence is None  # empty until the owner confirms it (§5.3)
+    assert citation.licence is None  # empty until confirmed from the dataset page
 
 
 def test_dataset_copy_records_hashes_and_citation(tmp_path: Path, repo_root: Path) -> None:
-    make_folder(tmp_path)
+    source = make_folder(tmp_path)
     citation = load_citation(repo_root / "reference" / "mendeley.yaml")
-    result = acquire_dataset(tmp_path / "raw", tmp_path, citation)
+    result = acquire_dataset(tmp_path / "raw", source, citation, origin="data/source")
     assert result.copied and result.mode == "dataset"
     (manifest_path,) = result.manifests
     assert manifest_path == tmp_path / "raw" / "mendeley" / "hvmhnp7f9r" / "v1" / "manifest.json"
     manifest = read_manifest(manifest_path)
     assert manifest.source is SourceKind.MENDELEY
     assert manifest.citation == CITATION
+    assert manifest.origin == "data/source"
     # Copies sit flat in their folder (short Windows paths); the manifest keeps the original.
     assert [(f.name, f.original) for f in manifest.files] == [
         ("NSE_data_all_stocks_2099.csv", "part/NSE_data_all_stocks_2099.csv")
@@ -74,17 +74,17 @@ def test_second_acquire_is_cached_until_a_file_changes(tmp_path: Path, repo_root
     source = make_folder(tmp_path)
     citation = load_citation(repo_root / "reference" / "mendeley.yaml")
     raw = tmp_path / "raw"
-    assert acquire_dataset(raw, tmp_path, citation).copied
-    assert not acquire_dataset(raw, tmp_path, citation).copied
+    assert acquire_dataset(raw, source, citation).copied
+    assert not acquire_dataset(raw, source, citation).copied
     # Changed, added and removed files all produce a new copy.
     (source / "part" / "NSE_data_all_stocks_2099.csv").write_text(
         "Date,Code\n3-Jan-99,AAA\n", encoding="utf-8"
     )
-    assert acquire_dataset(raw, tmp_path, citation).copied
+    assert acquire_dataset(raw, source, citation).copied
     (source / "part" / "NSE_data_all_stocks_2098.csv").write_text("Date,Code\n", encoding="utf-8")
-    assert acquire_dataset(raw, tmp_path, citation).copied
+    assert acquire_dataset(raw, source, citation).copied
     (source / "part" / "NSE_data_all_stocks_2098.csv").unlink()
-    result = acquire_dataset(raw, tmp_path, citation)
+    result = acquire_dataset(raw, source, citation)
     assert result.copied
     assert [f.name for f in read_manifest(result.manifests[0]).files] == [
         "NSE_data_all_stocks_2099.csv"
@@ -92,13 +92,13 @@ def test_second_acquire_is_cached_until_a_file_changes(tmp_path: Path, repo_root
 
 
 def test_a_tampered_copy_is_replaced(tmp_path: Path, repo_root: Path) -> None:
-    make_folder(tmp_path)
+    source = make_folder(tmp_path)
     citation = load_citation(repo_root / "reference" / "mendeley.yaml")
     raw = tmp_path / "raw"
-    result = acquire_dataset(raw, tmp_path, citation)
+    result = acquire_dataset(raw, source, citation)
     copied = result.manifests[0].parent / "NSE_data_all_stocks_2099.csv"
     copied.write_text("tampered", encoding="utf-8")
-    assert acquire_dataset(raw, tmp_path, citation).copied
+    assert acquire_dataset(raw, source, citation).copied
     assert copied.read_text(encoding="utf-8").startswith("Date,Code")
 
 
@@ -145,6 +145,20 @@ def test_stage_acquire_exits_10_with_guidance(tmp_path: Path) -> None:
     assert "--source-dir" in str(raised.value) and "--sample" in str(raised.value)
 
 
+def test_without_the_dataset_acquire_says_where_it_goes(tmp_path: Path) -> None:
+    """A fresh clone has no dataset files: the message says how to get them."""
+    ctx = RunContext(settings=settings_for(tmp_path / "data"), echo=lambda _m: None)
+    (tmp_path / "data" / "source").mkdir(parents=True)
+    (tmp_path / "data" / "source" / "README.md").write_text("Put the files here.\n")
+    with pytest.raises(StageError) as raised:
+        stage_acquire(ctx)
+    message = str(raised.value)
+    assert raised.value.exit_code == 10
+    assert "no .csv or .zip files" in message and "data/source" in message
+    assert "Mendeley Data" in message and "data/README.md" in message
+    assert "--source-dir" in message and "--sample" in message
+
+
 def test_sample_is_generated_once_and_recorded_as_active(
     tmp_path: Path, calendar: TradingCalendar
 ) -> None:
@@ -179,7 +193,7 @@ def test_same_names_in_different_folders_stay_apart(tmp_path: Path) -> None:
 
 
 def test_windows_line_endings_copy_and_hash_as_lf(tmp_path: Path) -> None:
-    """D-41: a CRLF checkout or download hashes like the LF file git stores, zips included."""
+    """A CRLF download hashes like the same file with LF line endings, zips included."""
     lf = b"Date,Code\n2-Jan-99,AAA\n"
     for name, data in (("lf", lf), ("crlf", lf.replace(b"\n", b"\r\n"))):
         source = tmp_path / name
@@ -211,7 +225,7 @@ def test_windows_line_endings_copy_and_hash_as_lf(tmp_path: Path) -> None:
 def test_a_crlf_copy_still_matches_its_correction(
     tmp_path: Path, calendar: TradingCalendar, repo_root: Path
 ) -> None:
-    """Corrections are keyed to the LF hash (§6.4); the owner's Windows copy must match too."""
+    """Corrections are keyed to the LF hash; a copy with Windows line endings matches too."""
     generate(tmp_path / "sample", calendar)
     planted = (tmp_path / "sample" / "NSE_data_all_stocks_2017.csv").read_bytes()
     windows = tmp_path / "windows"
@@ -227,11 +241,11 @@ def test_a_licence_edit_refreshes_the_record_without_copying(
 ) -> None:
     import dataclasses
 
-    make_folder(tmp_path)
+    source = make_folder(tmp_path)
     citation = load_citation(repo_root / "reference" / "mendeley.yaml")
     raw = tmp_path / "raw"
-    acquire_dataset(raw, tmp_path, citation)
+    acquire_dataset(raw, source, citation)
     licensed = dataclasses.replace(citation, licence="CC BY 4.0")
-    result = acquire_dataset(raw, tmp_path, licensed)
+    result = acquire_dataset(raw, source, licensed)
     assert not result.copied
     assert read_manifest(result.manifests[0]).licence == "CC BY 4.0"

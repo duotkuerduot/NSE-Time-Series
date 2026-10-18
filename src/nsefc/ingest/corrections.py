@@ -1,4 +1,4 @@
-"""Documented corrections to the source data (§6.4).
+"""Documented corrections to the source data.
 
 Each rule in ``reference/corrections.yaml`` is keyed to the SHA-256 of the one file it fixes,
 so it can never silently apply to a different dataset version: if the file changes, the rule

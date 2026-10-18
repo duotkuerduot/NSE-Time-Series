@@ -1,4 +1,4 @@
-"""The command line (§3): usage errors, guidance when inputs are missing, exit codes (§3.3)."""
+"""The command line: usage errors, guidance when inputs are missing, exit codes."""
 
 from __future__ import annotations
 
@@ -51,7 +51,7 @@ def test_maintainer_checks_pass_on_a_clean_tree(tmp_path: Path) -> None:
 
 
 def test_import_round_trip(tmp_path: Path) -> None:
-    """§5.5: imports add later sessions, are labelled, and may not overlap."""
+    """Imports add later sessions, are labelled, and may not overlap."""
     from nsefc.storage import read_json
     from tests.unit.test_ingest import GOLDEN
 

@@ -78,8 +78,8 @@ def test_2026_known_holidays(calendar: TradingCalendar) -> None:
     assert names[date(2026, 5, 27)] == "Idd-ul-Azha"
 
 
-def test_engineering_md_mashujaa_example(calendar: TradingCalendar) -> None:
-    # ENGINEERING.md 7.5: the forecast made after Mon 19 Oct 2026 targets Wed 21 Oct.
+def test_the_mashujaa_day_example(calendar: TradingCalendar) -> None:
+    # Mashujaa Day (Tue 20 Oct 2026): the forecast made after Mon 19 Oct targets Wed 21 Oct.
     assert calendar.next_session(date(2026, 10, 19)) == date(2026, 10, 21)
     assert calendar.previous_session(date(2026, 10, 21)) == date(2026, 10, 19)
     assert not calendar.is_scheduled_session(date(2026, 10, 20))
@@ -141,7 +141,7 @@ def test_latest_session_on_or_before(calendar: TradingCalendar) -> None:
 
 
 def test_2026_session_count_to_date(calendar: TradingCalendar) -> None:
-    # The gap the review flagged (MF-2): 1 Jan to 7 Oct 2026.
+    # Sessions from 1 Jan to 7 Oct 2026, with every 2026 holiday accounted for.
     assert len(calendar.sessions_in(date(2026, 1, 1), date(2026, 10, 7))) == 193
 
 

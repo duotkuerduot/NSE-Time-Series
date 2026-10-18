@@ -1,4 +1,4 @@
-"""Run context, stage fingerprints and the JSON-lines run log (§19)."""
+"""Run context, stage fingerprints and the JSON-lines run log."""
 
 from __future__ import annotations
 
@@ -21,7 +21,7 @@ Echo = Callable[[str], None]
 
 
 class StageError(RuntimeError):
-    """A stage failed; ``exit_code`` follows §3.3."""
+    """A stage failed; ``exit_code`` is the documented exit code (docs/architecture.md)."""
 
     def __init__(self, message: str, exit_code: int) -> None:
         super().__init__(message)
@@ -56,7 +56,7 @@ def file_hash(path: Path) -> str:
 
 
 PACKAGE = Path(__file__).resolve().parents[1]
-# The code each stage's results depend on (D-29): a change re-runs that stage and everything
+# The code each stage's results depend on: a change re-runs that stage and everything
 # after it, so an updated clone never reuses results computed by older code.
 STAGE_CODE: dict[str, tuple[str, ...]] = {
     "ingest": (
@@ -92,7 +92,7 @@ def code_hash(stage: str) -> str:
 @dataclass(slots=True)
 class RunContext:
     settings: Settings
-    profile: str = "default"  # "default" or "full" (§11.1)
+    profile: str = "default"  # "default" or "full"
     mode: str = "mendeley"  # mendeley, local or sample
     force: bool = False
     verbose: bool = False

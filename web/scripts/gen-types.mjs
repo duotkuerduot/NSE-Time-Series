@@ -1,4 +1,4 @@
-// Generates TypeScript types from the API contract's JSON Schema (ENGINEERING.md 22.1).
+// Generates TypeScript types from the API contract's JSON Schema.
 // `--check` fails when the committed types are out of date, so CI catches contract drift.
 import { readdir, readFile, writeFile, mkdir } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";

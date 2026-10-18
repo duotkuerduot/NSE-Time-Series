@@ -1,4 +1,4 @@
-"""Features (§8): scale-free, as-of only, windows in trading sessions.
+"""Features: scale-free, as-of only, windows in trading sessions.
 
 Feature code reaches data only through ``load_panel(as_of=T)`` (rule L1) and may not import
 ``nsefc.targets`` (rule L2, enforced by import-linter).

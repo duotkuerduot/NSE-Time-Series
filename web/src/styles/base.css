@@ -1,4 +1,4 @@
-/* Base styles and shared components (docs/design/redesign.md). Space and thin rules separate
+/* Base styles and shared components (docs/architecture.md, Design). Space and thin rules separate
    sections; there are no cards and no shadows. Every figure uses tabular numerals. */
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }

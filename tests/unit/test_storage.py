@@ -1,4 +1,4 @@
-"""Local files only (§6.1): atomic writes, folder swaps, safe paths and date-typed tables."""
+"""Local files only: atomic writes, folder swaps, safe paths and date-typed tables."""
 
 from __future__ import annotations
 

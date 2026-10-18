@@ -6,8 +6,8 @@ import { COPY } from "../lib/copy";
 import { formatPrice } from "../lib/format";
 import { search } from "../lib/search";
 
-/** Combobox following the ARIA pattern: arrows move, Enter opens, Escape clears (24.3).
- * On the homepage the label doubles as the page's h1 (24.2: search is the primary action). */
+/** Combobox following the ARIA pattern: arrows move, Enter opens, Escape clears.
+ * On the homepage the label doubles as the page's h1 (search is the primary action). */
 export function StockSearch({
   autoFocus = false,
   asHeading = false,

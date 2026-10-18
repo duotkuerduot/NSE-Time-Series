@@ -1,4 +1,4 @@
-"""Synthetic sample dataset in the Mendeley file format (ENGINEERING.md §16.3).
+"""Synthetic sample dataset in the Mendeley file format.
 
 About 30 fictional tickers (SMPL01 to SMPL30, clearly not real companies) trading over the
 NSE calendar from 2015 to 2024. The prices behave like NSE closes: each is a session VWAP,
@@ -22,7 +22,7 @@ from __future__ import annotations
 import csv
 import io
 from dataclasses import dataclass
-from datetime import date, timedelta
+from datetime import date
 from pathlib import Path
 
 import numpy as np
@@ -281,7 +281,3 @@ def generate(target: Path, calendar: TradingCalendar) -> list[Path]:
     sector_path.write_bytes(sectors.getvalue().encode("utf-8"))
     written.append(sector_path)
     return sorted(written)
-
-
-def misdated_session_offset() -> timedelta:
-    return MISDATED[0] - MISDATED[1]

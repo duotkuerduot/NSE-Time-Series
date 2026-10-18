@@ -44,7 +44,7 @@ export type Severity = ("info" | "warning")
 export type Notices = Notice[]
 
 /**
- * Pointer to the current release, plus run and data status (§13.3).
+ * Pointer to the current release, plus run and data status.
  */
 export interface Status {
 api_version: ApiVersion

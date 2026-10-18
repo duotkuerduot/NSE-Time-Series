@@ -5,7 +5,7 @@ import { COPY } from "../lib/copy";
 import { isStale } from "../lib/staleness";
 import { StockSearch } from "./StockSearch";
 
-/** "Data through Fri 31 Oct 2025 · Mendeley Data v1", or "· Sample data" (§15.2). */
+/** "Data through Fri 31 Oct 2025 · Mendeley Data v1", or "· Sample data". */
 export function dataLabel(status: Status): string {
   const through = COPY.dataThrough(status.latest_session);
   const imported = status.data_mode === "historical+imports" ? `, ${COPY.withImports}` : "";

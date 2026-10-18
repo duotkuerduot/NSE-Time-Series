@@ -1,4 +1,4 @@
-"""Stage 3, train and evaluate (§10-§12): walk-forward for every model, gates, champion."""
+"""Stage 3, train and evaluate: walk-forward for every model, gates, champion."""
 
 from __future__ import annotations
 
@@ -122,10 +122,6 @@ def model_data(ctx: RunContext, features_fp: str) -> ModelData:
     return data
 
 
-def hyperparameters(settings: Settings, model_id: str) -> dict[str, Any]:
-    return dict(settings.model_specs[model_id].frozen)
-
-
 def _factory_with(
     settings: Settings, model_id: str, data: ModelData, params: dict[str, Any]
 ) -> Callable[[], Forecaster]:
@@ -168,7 +164,7 @@ def factory(
 def tune_candidates(
     ctx: RunContext, data: ModelData, candidates: list[str], trials: int
 ) -> dict[str, dict[str, Any]]:
-    """Tune on the tuning period only (§11.2) and save the values at once, so a later stop
+    """Tune on the tuning period only and save the values at once, so a later stop
     (G-PLAUS, say) never loses them: ``data/models/<run_id>/tuned.json``."""
     s = ctx.settings
     tuned: dict[str, dict[str, Any]] = {}
@@ -347,7 +343,7 @@ def run_training(ctx: RunContext, data: ModelData, *, dataset_info: dict[str, An
         )
     choice = choose_champion(assessments, s.gates, paired_p=paired_p)
 
-    # Refit the champion on every labelled row and save it for the forecast (§11.2).
+    # Refit the champion on every labelled row and save it for the forecast.
     champion_id = choice.champion
     everything = training_rows(data.table, held[-1] + pd.Timedelta(days=1)).sort_values(
         ["session_date", "ticker"], kind="stable"

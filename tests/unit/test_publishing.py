@@ -1,4 +1,4 @@
-"""Publishing helpers (§13)."""
+"""Publishing helpers."""
 
 from __future__ import annotations
 

@@ -1,6 +1,6 @@
 import type { StockIndexItem } from "../api";
 
-// Client-side search over the securities index (ENGINEERING.md 22.3, 24.3).
+// Client-side search over the securities index.
 export const MAX_RESULTS = 8;
 
 export function normalise(text: string): string {
@@ -44,7 +44,7 @@ export function search(items: StockIndexItem[], query: string, limit = MAX_RESUL
     .map((entry) => entry.item);
 }
 
-/** A former ticker or name resolves to the current security (22.3). */
+/** A former ticker or name resolves to the current security. */
 export function resolveAlias(items: StockIndexItem[], ticker: string): StockIndexItem | undefined {
   const q = normalise(ticker);
   return items.find((item) => (item.aliases ?? []).some((alias) => normalise(alias) === q));

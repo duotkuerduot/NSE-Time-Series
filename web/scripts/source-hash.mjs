@@ -1,4 +1,4 @@
-// The SHA-256 written to src/nsefc/web_dist/.source-hash after every build (ENGINEERING.md §15.4).
+// The SHA-256 written to src/nsefc/web_dist/.source-hash after every build.
 // It must match `uv run nsefc dev web-hash` (src/nsefc/devtools): web/src/** sorted by POSIX path,
 // then the build inputs; each file contributes its path, a NUL, its bytes with CRLF read as LF,
 // and a NUL. CI recomputes it in Python and fails if the committed build is stale.

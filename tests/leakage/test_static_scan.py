@@ -1,8 +1,7 @@
-"""Leakage rule L2: banned constructs in nsefc/features fail CI (ENGINEERING.md 12.4, 27.2).
+"""Leakage rule L2: banned constructs in nsefc/features fail CI.
 
 Negative shifts, centred windows, back-fill and interpolation can all pull future values into
-a feature. The scan runs over the features package from Phase 0, so the rule holds from the
-first line of feature code.
+a feature. The scan covers every file in the features package.
 """
 
 from __future__ import annotations

@@ -1,4 +1,4 @@
-"""Gates and champion selection (§11.4, §11.5): each gate passes and fails on constructed results."""
+"""Gates and champion selection: each gate passes and fails on constructed results."""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-# Documented corrections to the source data (ENGINEERING.md §6.4).
+# Documented corrections to the source data (data/README.md lists the defects).
 #
 # Each rule fixes rows in exactly one file, identified by its SHA-256, so it never applies to
 # a different dataset version: if a file changes, its rules stop matching and the check they
@@ -7,7 +7,7 @@
 #
 # Evidence for each redate: the block sits between the right neighbours in the file, every
 # row's "Previous" equals the prior session's close, and the next session's "Previous" equals
-# the block's closes (checked in Phase 1, docs/data/mendeley-dataset.md).
+# the block's closes.
 version: 1
 corrections:
   # ---------------------------------------------------------------- NSE data, 2009 file
@@ -54,7 +54,7 @@ corrections:
       Wrong year: a 70-row block dated Saturday 9 May 2015 sits between 8 and 10 May 2017, and
       the prices chain 8 May -> block -> 10 May 2017.
 
-  # ---------------------------------------------------------------- synthetic sample (§16.3)
+  # ---------------------------------------------------------------- synthetic sample
   # The sample generator plants this defect on purpose; tests/unit/test_sample.py fails if the
   # generated file's hash changes, so this rule is updated together with the generator.
   - id: SAMPLE-01

@@ -1,7 +1,7 @@
 import type { Status } from "./index";
 
 // The API is the static JSON that `nsefc publish` writes to data/api/v1 and `nsefc serve`
-// serves next to the app (ENGINEERING.md §15.1). In development, Vite serves the contract
+// serves next to the app. In development, Vite serves the contract
 // fixtures at the same path.
 export const API_BASE = "/api/v1";
 

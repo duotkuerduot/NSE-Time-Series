@@ -1,4 +1,4 @@
-"""Trading calendar and session arithmetic (ENGINEERING.md 7.5).
+"""Trading calendar and session arithmetic.
 
 Every module asks this one for sessions; nobody computes "tomorrow" with date arithmetic.
 """
@@ -287,7 +287,7 @@ class TradingCalendar:
     def next_session_or_weekday(self, day: date) -> tuple[date, bool]:
         """The next session, or the next weekday when ``day`` is past the calendar's coverage.
 
-        The second value says whether the calendar answered (§7 point 4): when it is False,
+        The second value says whether the calendar answered: when it is False,
         the app labels the date "next weekday (calendar not available)".
         """
         try:
@@ -316,8 +316,7 @@ class TradingCalendar:
     def sessions_between(self, after: date, through: date) -> list[date]:
         """Scheduled sessions in the half-open interval (after, through].
 
-        This is the shape ingestion needs: sessions after the last committed one, up to and
-        including the as-of session (ENGINEERING.md 9.2 step 3).
+        Sessions after a known one, up to and including the as-of session.
         """
         after, through = self._check(after), self._check(through)
         if through <= after:

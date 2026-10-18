@@ -1,4 +1,4 @@
-"""Stage 5, publish (§13): the static JSON files the web app reads.
+"""Stage 5, publish: the static JSON files the web app reads.
 
 Everything here works on finished tables (canonical data, walk-forward predictions, the
 forecast and the evaluation summary) and never imports the ML layer. Each file is validated

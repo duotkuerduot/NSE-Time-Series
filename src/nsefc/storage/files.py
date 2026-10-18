@@ -2,7 +2,7 @@
 
 Every stage writes its outputs somewhere temporary and then moves them into place, so a
 crash or Ctrl+C never leaves a half-written file where a later stage (or the local server)
-would read it (§19). Works the same on Windows, macOS and Linux.
+would read it. Works the same on Windows, macOS and Linux.
 """
 
 from __future__ import annotations
@@ -136,7 +136,7 @@ def swap_dir(staged: Path, final: Path) -> None:
 
 @contextlib.contextmanager
 def staged_dir(final: Path) -> Iterator[Path]:
-    """Yield an empty folder beside ``final``; on success swap it into place (§19 step 4)."""
+    """Yield an empty folder beside ``final``; on success swap it into place."""
     final = Path(final)
     final.parent.mkdir(parents=True, exist_ok=True)
     staged = final.with_name(f".tmp-{final.name}-{uuid.uuid4().hex[:8]}")
@@ -174,7 +174,7 @@ def clean_stale_temporaries(folder: Path) -> int:
 
 
 def safe_join(root: Path, relative: str) -> Path:
-    """``root / relative``, refusing anything that resolves outside root (§15.5)."""
+    """``root / relative``, refusing anything that resolves outside root."""
     posix = PurePosixPath(relative.replace("\\", "/"))
     if posix.is_absolute() or ".." in posix.parts:
         raise UnsafePathError(relative)

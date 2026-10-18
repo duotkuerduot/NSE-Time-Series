@@ -9,7 +9,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-import numpy as np
 import pandas as pd
 
 from nsefc.domain import InstrumentType
@@ -47,7 +46,7 @@ def _per_ticker(
 
 
 def universe_flags(panel: Panel, rule: UniverseRule) -> pd.DataFrame:
-    """Point-in-time forecast-universe membership for every row (§13.1)."""
+    """Point-in-time forecast-universe membership for every row."""
     bars = panel.bars
     tickers = bars["ticker"]
     pos = bars["pos"].to_numpy()
@@ -162,7 +161,3 @@ def test_rows(
 def members_at(table: pd.DataFrame, day: pd.Timestamp) -> set[str]:
     rows = table[(table["session_date"] == day) & table["in_universe"]]
     return set(rows["ticker"].astype(str))
-
-
-def nan_safe(values: np.ndarray) -> np.ndarray:
-    return np.where(np.isfinite(values), values, 0.0)

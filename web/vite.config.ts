@@ -7,11 +7,11 @@ import { sourceHash } from "./scripts/source-hash.mjs";
 
 const REPO = resolve(import.meta.dirname, "..");
 const FIXTURES = resolve(REPO, "contracts/api/v1/fixtures");
-// The built app ships inside the Python package, so running the tool needs no Node.js (§15.4).
+// The built app ships inside the Python package, so running the tool needs no Node.js.
 const OUT_DIR = resolve(REPO, "src/nsefc/web_dist");
 
 // Serves the contract fixtures at /api/v1 in `vite` and `vite preview`, so every page renders
-// without running the pipeline. The real app is served by `nsefc serve` (§15.5).
+// without running the pipeline. The real app is served by `nsefc serve`.
 function serveFixtures(): Plugin {
   const middleware: Connect.NextHandleFunction = async (req, res, next) => {
     const url = (req.url ?? "").split("?")[0] ?? "";

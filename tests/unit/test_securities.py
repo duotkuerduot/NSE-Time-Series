@@ -1,4 +1,4 @@
-"""Securities and aliases (§6.5)."""
+"""Securities and aliases."""
 
 from __future__ import annotations
 

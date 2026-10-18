@@ -1,4 +1,4 @@
-"""Every quality check in §6.6 has a passing and a failing case (§16.1)."""
+"""Every quality check has a passing and a failing case."""
 
 from __future__ import annotations
 

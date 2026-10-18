@@ -1,4 +1,4 @@
-"""The harness on data with a known answer (§16.2).
+"""The harness on data with a known answer.
 
 * Random walks: no model may show significant skill; any skill means a bug (a leak).
 * Planted AR(1) returns: the harness must find roughly the skill theory predicts, and the AR(1)

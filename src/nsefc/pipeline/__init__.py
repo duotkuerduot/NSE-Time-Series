@@ -1,4 +1,4 @@
-"""Runs the stages in order with caching (ENGINEERING.md §19).
+"""Runs the stages in order with caching.
 
 acquire -> ingest -> train (and evaluate) -> predict -> publish. Each stage fingerprints its
 inputs, skips itself when its stamp in ``data/stamps/`` matches, writes its outputs to a

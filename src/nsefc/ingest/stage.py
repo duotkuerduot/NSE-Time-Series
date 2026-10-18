@@ -1,4 +1,4 @@
-"""Stage 2, ingest (§6): raw files -> the canonical panel in ``data/canonical/``."""
+"""Stage 2, ingest: raw files -> the canonical panel in ``data/canonical/``."""
 
 from __future__ import annotations
 
@@ -146,7 +146,7 @@ def _source_label(manifest: Manifest) -> str:
 
 
 def read_import_file(path: Path, *, sha256: str, relative_name: str) -> pd.DataFrame:
-    """A user import (§5.5): date, ticker, close, volume and optional extra columns."""
+    """A user import: date, ticker, close, volume and optional extra columns."""
     table = pd.read_csv(path, dtype=str, keep_default_na=False)
     table.columns = [c.strip().lower() for c in table.columns]
     required = {"date", "ticker", "close", "volume"}
@@ -198,7 +198,7 @@ def ingest(
     raw, sectors_raw, counts, years = _read_sources(sources)
     counts["source_rows"] = len(raw)
 
-    # 1. Documented corrections, keyed to file hashes (§6.4).
+    # 1. Documented corrections, keyed to file hashes.
     corrections = load_corrections(reference_dir / "corrections.yaml")
     raw, correction_report = apply_corrections(raw, corrections)
 
@@ -213,7 +213,7 @@ def ingest(
     )
     rows = raw[~is_index].copy()
 
-    # 3. Alias mapping: former tickers become current ones (§6.5).
+    # 3. Alias mapping: former tickers become current ones.
     reference = load_reference(reference_dir / "securities.csv")
     aliases = alias_map(reference)
     rows["ticker"] = rows["code"].map(lambda c: aliases.get(c, c))
@@ -254,7 +254,8 @@ def ingest(
     untraded = rows["volume"] == 0
     rows.loc[untraded, ["high", "low"]] = np.nan  # an untraded session has no range
 
-    # 6. Market-level checks on observed rows only, before any synthesis (MF-3).
+    # 6. Market-level checks on observed rows only, before any synthesis, so carried-forward
+    #    rows can never hide a missing session.
     observed_counts = rows.groupby("session_date")["ticker"].nunique()
     first, last = rows["session_date"].min(), rows["session_date"].max()
     sessions, off_calendar = classify_sessions(observed_counts, calendar, first, last)

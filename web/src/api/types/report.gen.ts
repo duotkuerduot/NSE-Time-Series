@@ -48,7 +48,7 @@ export type ModelId1 = string
 export type Label1 = string
 export type IsChampion = boolean
 /**
- * Gate id from ENGINEERING.md §11.4, e.g. G-SKILL
+ * Gate id, e.g. G-SKILL (docs/methodology.md, Gates)
  */
 export type Id = string
 /**
@@ -69,7 +69,7 @@ export type EventsExcluded = number
 export type CarriedForwardRows = number
 
 /**
- * Evaluation results for the About page (§13.3 item 4).
+ * Evaluation results for the About page.
  */
 export interface Report {
 profile: Profile

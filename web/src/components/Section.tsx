@@ -9,7 +9,7 @@ interface Props {
   children: ReactNode;
 }
 
-/** One section's loading and error states; a failure never blanks the rest of the page (24.6). */
+/** One section's loading and error states; a failure never blanks the rest of the page. */
 export function Section({ title, isPending, error, onRetry, children }: Props) {
   return (
     <section aria-labelledby={slug(title)}>

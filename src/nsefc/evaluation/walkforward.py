@@ -1,4 +1,4 @@
-"""Walk-forward evaluation (§11.2): expanding training windows, periodic refits.
+"""Walk-forward evaluation: expanding training windows, periodic refits.
 
 At each refit date R every model is fitted on labelled rows with origin before R (so the
 training window ends at least one session before the test window, rule L5) and then
@@ -101,7 +101,7 @@ def walk_forward(
 def add_intervals(
     predictions: pd.DataFrame, *, window: int, level: float, band: float
 ) -> pd.DataFrame:
-    """Rolling conformal intervals per model (§12 step 4): only past scores calibrate."""
+    """Rolling conformal intervals per model: only past scores calibrate."""
     out = []
     for _model_id, group in predictions.groupby("model_id", sort=True):
         group = group.copy()

@@ -1,7 +1,7 @@
-"""Shared fixtures (ENGINEERING.md §16).
+"""Shared fixtures.
 
 Synthetic panels are built in memory for the ML and leakage tests; the pipeline tests run the
-real stages on the synthetic sample dataset (§16.3) in a temporary data folder.
+real stages on the synthetic sample dataset in a temporary data folder.
 """
 
 from __future__ import annotations
@@ -170,6 +170,6 @@ def cli(args: list[str], data_dir: Path) -> CliRun:
 
 @pytest.fixture(scope="session")
 def sample_run(tmp_path_factory: pytest.TempPathFactory) -> CliRun:
-    """`nsefc run --sample --no-serve` once, shared by the pipeline tests (§16.5)."""
+    """`nsefc run --sample --no-serve` once, shared by the pipeline tests."""
     data_dir = tmp_path_factory.mktemp("sample-data")
     return cli(["run", "--sample", "--no-serve"], data_dir)

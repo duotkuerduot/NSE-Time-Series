@@ -1,37 +1,49 @@
-# Derived data: computed by each run, never committed (ENGINEERING.md §6.1, AC-04).
-# The source dataset itself is committed in "NSE Data/" (owner decision, §22 D-10).
+# Data: the dataset files and everything each run computes stay on your machine.
+# Only the READMEs and .gitkeep are committed (see data/README.md).
 data/*
 !data/.gitkeep
 !data/README.md
+!data/source/
+data/source/*
+!data/source/README.md
 
 # Python
 __pycache__/
 *.py[cod]
 .venv/
+venv/
 .mypy_cache/
 .ruff_cache/
 .pytest_cache/
 .hypothesis/
 .import_linter_cache/
 .coverage
+.coverage.*
 htmlcov/
 dist/
 build/
 *.egg-info/
 
 # Web (the built app is committed in src/nsefc/web_dist instead)
-web/node_modules/
+node_modules/
 web/dist/
 web/coverage/
 web/playwright-report/
 web/test-results/
+web/blob-report/
+*.tsbuildinfo
 
 # Local leftovers
 var/
 .env
+.env.*
+*.log
 
 # Editors and OS
 .idea/
 .vscode/
+*.swp
+*~
 .DS_Store
 Thumbs.db
+desktop.ini

@@ -1,14 +1,14 @@
-# NSE trading calendar: source of truth for which weekdays are sessions (ENGINEERING.md 7.5).
+# NSE trading calendar: the source of truth for which weekdays are sessions.
 #
 # Status values
 #   rule         fixed-date or Easter-based statutory holiday
-#   confirmed    NSE trading data shows no trading that day (repository "NSE Data", 2007 to June 2026)
+#   confirmed    NSE trading data shows no trading that day (the dataset, 2007 to June 2026)
 #   listed       on published 2024-2026 holiday lists, not yet checked against trading data
 #   provisional  expected but not yet gazetted (moon-dependent) or not verifiable (no data)
 #
-# Every change goes through a reviewed pull request. Weekday gaps in the trading data that
-# no entry explains are listed in reports/calendar-reconciliation.md for the Phase 1 audit;
-# they are deliberately NOT entered here until someone finds the reason.
+# Every change goes through a reviewed pull request. Weekday gaps in the trading data that no
+# entry explains stay out of this file until a reason is found: they are missing sessions,
+# listed by check GAP-01 in data/reports/data-audit.md.
 version: 1
 timezone: Africa/Nairobi
 coverage:
@@ -90,15 +90,15 @@ closures:
   - {date: 2017-11-28, name: Presidential inauguration, status: confirmed, source: "NSE data"}
   - {date: 2020-02-11, name: National mourning (former President Moi), status: confirmed, source: "NSE data"}
   - {date: 2022-04-29, name: National mourning (former President Kibaki), status: confirmed, source: "NSE data"}
-  - {date: 2022-08-09, name: General election, status: confirmed, source: "NSE data; ENGINEERING.md 7.5"}
+  - {date: 2022-08-09, name: General election, status: confirmed, source: "NSE data"}
   - {date: 2022-09-13, name: Presidential inauguration, status: confirmed, source: "NSE data"}
   - {date: 2023-11-13, name: National Tree Growing Day, status: confirmed, source: "NSE data"}
   - {date: 2024-05-10, name: National Tree Growing Day, status: confirmed, source: "NSE data; officeholidays.com"}
-  - {date: 2024-11-01, name: Special public holiday, status: confirmed, source: "NSE data; officeholidays.com (reason to verify)"}
-  - {date: 2025-10-17, name: Special public holiday (national mourning), status: confirmed, source: "NSE data; officeholidays.com (verify gazette notice)"}
+  - {date: 2024-11-01, name: Special public holiday, status: confirmed, source: "NSE data; officeholidays.com (reason not confirmed by a gazette notice)"}
+  - {date: 2025-10-17, name: Special public holiday (national mourning), status: confirmed, source: "NSE data; officeholidays.com (gazette notice not checked)"}
 
 # Weekdays the rules above would close but on which the market traded: for history the data
-# wins (ENGINEERING.md 7.5). Each was a full session (about 57 to 59 securities quoted and
+# wins. Each was a full session (about 57 to 59 securities quoted and
 # 36 to 42 traded, like the days around it).
 held_sessions:
   - {date: 2010-12-27, status: confirmed, source: "NSE data: Boxing Day on Sunday 26 Dec 2010 was not moved to Monday"}

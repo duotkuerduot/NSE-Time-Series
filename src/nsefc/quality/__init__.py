@@ -1,4 +1,4 @@
-"""Data-quality checks (§6.6)."""
+"""Data-quality checks."""
 
 from nsefc.quality.checks import CheckResult, DataQualityError, errors, missing_ranges
 

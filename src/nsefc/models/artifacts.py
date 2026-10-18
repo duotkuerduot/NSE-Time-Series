@@ -1,7 +1,7 @@
-"""Model artifacts (§10.3): joblib files with a JSON sidecar holding their SHA-256.
+"""Model artifacts: joblib files with a JSON sidecar holding their SHA-256.
 
 Pickle-based files are acceptable here because the tool only ever loads artifacts it produced
-on the same machine, and refuses any whose hash does not match its sidecar (D-9). It never
+on the same machine, and refuses any whose hash does not match its sidecar. It never
 downloads or accepts model files from anywhere else.
 """
 

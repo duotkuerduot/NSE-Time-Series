@@ -1,4 +1,4 @@
-"""The local server (§15.5): standard library, 127.0.0.1, JSON API, SPA fallback, no escapes."""
+"""The local server: standard library, 127.0.0.1, JSON API, SPA fallback, no escapes."""
 
 from __future__ import annotations
 

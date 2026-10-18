@@ -1,20 +1,12 @@
-"""Closed sets shared across modules. Values are the strings stored in the database and API."""
+"""Closed sets shared across modules. Values are the strings stored in files and the API."""
 
 from __future__ import annotations
 
 from enum import StrEnum
 
 
-class PriceBasis(StrEnum):
-    """How a provider defines the daily price (ENGINEERING.md 7.2, check PRV-02)."""
-
-    VWAP = "vwap"  # NSE official price: VWAP of the whole session (Equity Trading Rules 7.6.1)
-    LAST = "last"  # last traded price
-    UNKNOWN = "unknown"
-
-
 class Severity(StrEnum):
-    """Data-quality severities (§6.6): error blocks the run, exclude drops rows from modelling."""
+    """Data-quality severities: error blocks the run, exclude drops rows from modelling."""
 
     ERROR = "error"
     EXCLUDE = "exclude"
@@ -22,59 +14,8 @@ class Severity(StrEnum):
     INFO = "info"
 
 
-class CheckScope(StrEnum):
-    ROW = "row"
-    BATCH = "batch"
-    HISTORY = "history"
-
-
-class SessionIngestStatus(StrEnum):
-    """Per-session commit status (table session_ingest).
-
-    MISSING_ACKNOWLEDGED is terminal: an audited command records that no source will ever
-    supply the session, so ingestion may move past it (review MF-1). Labels never span it.
-    """
-
-    PENDING = "pending"
-    COMMITTED = "committed"
-    QUARANTINED = "quarantined"
-    MISSING = "missing"
-    MISSING_ACKNOWLEDGED = "missing_acknowledged"
-
-    @property
-    def is_resolved(self) -> bool:
-        return self in (SessionIngestStatus.COMMITTED, SessionIngestStatus.MISSING_ACKNOWLEDGED)
-
-
-class SecurityStatus(StrEnum):
-    ACTIVE = "active"
-    SUSPENDED = "suspended"
-    DELISTED = "delisted"
-
-
-class CorporateActionType(StrEnum):
-    SPLIT = "split"
-    CONSOLIDATION = "consolidation"
-    BONUS = "bonus"
-    RIGHTS = "rights"
-    DIVIDEND = "dividend"
-
-
-class ModelStatus(StrEnum):
-    CANDIDATE = "candidate"
-    SHADOW = "shadow"
-    CHAMPION = "champion"
-    RETIRED = "retired"
-    REJECTED = "rejected"
-
-
-class PredictionRole(StrEnum):
-    CHAMPION = "champion"
-    SHADOW = "shadow"
-
-
 class UnavailableReason(StrEnum):
-    """Why a security has no forecast in a release (ENGINEERING.md 22.3)."""
+    """Why a security has no forecast in a release (API contract v1)."""
 
     NOT_IN_FORECAST_UNIVERSE = "NOT_IN_FORECAST_UNIVERSE"
     INSUFFICIENT_HISTORY = "INSUFFICIENT_HISTORY"
@@ -100,7 +41,7 @@ class DataMode(StrEnum):
 
 
 class SourceKind(StrEnum):
-    """Where raw files came from (§5): the manifest's ``source`` field."""
+    """Where raw files came from: the manifest's ``source`` field."""
 
     MENDELEY = "mendeley"
     LOCAL = "local"
@@ -109,7 +50,7 @@ class SourceKind(StrEnum):
 
 
 class InstrumentType(StrEnum):
-    """Only ordinary shares enter the forecast universe (§6.5, §13.1)."""
+    """Only ordinary shares enter the forecast universe."""
 
     ORDINARY = "ordinary"
     PREFERENCE = "preference"
@@ -117,11 +58,3 @@ class InstrumentType(StrEnum):
     ETF = "etf"
     REIT = "reit"
     INDEX = "index"
-
-
-class SessionStatus(StrEnum):
-    """A weekday in ``sessions.parquet`` (§6.1, §7)."""
-
-    HELD = "held"
-    MISSING = "missing"
-    HOLIDAY = "holiday"

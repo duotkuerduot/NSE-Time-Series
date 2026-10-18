@@ -107,7 +107,7 @@ decliners: Decliners1
 unchanged: Unchanged1
 }
 /**
- * Rolling 60-session record of forecasts as published (review FE-4).
+ * Rolling 60-session record of forecasts as published.
  */
 export interface TrackRecordSeries {
 dates: Dates2

@@ -1,9 +1,9 @@
 """Draft reference/securities.csv from a folder of dataset files (run once, then review by hand).
 
-    uv run python scripts/build_securities.py "NSE Data" > reference/securities.csv.draft
+    uv run python scripts/build_securities.py data/source > reference/securities.csv.draft
 
-Former tickers below were confirmed in Phase 1: the 2012 file's last close for each old code
-equals the first "Previous" for the new code in 2013 (docs/data/mendeley-dataset.md).
+Former tickers below were confirmed from prices: the 2012 file's last close for each old code
+equals the first "Previous" for the new code in 2013.
 """
 
 from __future__ import annotations

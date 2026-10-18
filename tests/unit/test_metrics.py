@@ -1,4 +1,4 @@
-"""Metrics (§11.3): MAE skill, the Diebold-Mariano test and directional accuracy."""
+"""Metrics: MAE skill, the Diebold-Mariano test and directional calls."""
 
 from __future__ import annotations
 

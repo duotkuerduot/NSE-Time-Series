@@ -2,7 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
-// End to end (ENGINEERING.md §16.5): run against `nsefc serve` after `nsefc run --sample`,
+// End to end: run against `nsefc serve` after `nsefc run --sample`,
 // with NSEFC_E2E_URL pointing at the server. The tests read the published API to pick tickers.
 async function axe(page: Page): Promise<string[]> {
   const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();

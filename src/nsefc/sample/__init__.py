@@ -1,4 +1,4 @@
-"""Deterministic synthetic sample dataset (§16.3), for `--sample` and for CI."""
+"""Deterministic synthetic sample dataset, for `--sample` and for CI."""
 
 from nsefc.sample.generator import GENERATOR_VERSION, generate
 

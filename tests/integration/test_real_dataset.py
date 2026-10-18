@@ -1,4 +1,7 @@
-"""The real dataset in `NSE Data/` ingests to the documented panel (Phase 2 check, AC-05)."""
+"""The real dataset in `data/source/` ingests to the panel data/README.md describes.
+
+Skipped when the Mendeley files are not in `data/source/` (they are not in the repository).
+"""
 
 from __future__ import annotations
 
@@ -9,15 +12,17 @@ from nsefc.pipeline.stages import stage_acquire, stage_ingest
 from nsefc.storage import read_json
 from tests.conftest import ROOT, settings_for
 
+SOURCE = ROOT / "data" / "source"
 pytestmark = pytest.mark.skipif(
-    not (ROOT / "NSE Data").is_dir(), reason="NSE Data is not in this checkout"
+    not any(SOURCE.rglob("NSE_data_all_stocks_*.csv")), reason="the dataset is not in data/source"
 )
 
 
 @pytest.fixture(scope="module")
 def report(tmp_path_factory: pytest.TempPathFactory) -> dict:  # type: ignore[type-arg]
     data = tmp_path_factory.mktemp("real")
-    ctx = RunContext(settings=settings_for(data, profile="default"), echo=lambda _m: None)
+    settings = settings_for(data, profile="default", **{"paths.source_dir": str(SOURCE)})
+    ctx = RunContext(settings=settings, echo=lambda _m: None)
     stage_acquire(ctx)
     stage_ingest(ctx)
     return read_json(data / "canonical" / "ingest_report.json")  # type: ignore[no-any-return]
@@ -38,7 +43,7 @@ def test_counts_match_the_documented_findings(report: dict) -> None:  # type: ig
     assert counts["identical_duplicates_dropped"] == 64
 
 
-def test_every_phase_0_defect_has_a_documented_rule(report: dict) -> None:  # type: ignore[type-arg]
+def test_every_known_defect_has_a_documented_rule(report: dict) -> None:  # type: ignore[type-arg]
     applied = {c["id"]: c["rows"] for c in report["corrections"]}
     assert applied == {"R2009-01": 40, "R2009-02": 59, "R2009-03": 59, "R2017-01": 70}
     checks = {c["id"]: c for c in report["checks"]}

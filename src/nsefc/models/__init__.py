@@ -1,4 +1,4 @@
-"""Baselines (§10.1), candidates (§10.2) and hashed artifacts (§10.3). Pure estimators."""
+"""Baselines, candidate models and hash-checked model files. Pure estimators."""
 
 from nsefc.models.artifacts import ArtifactError, load_artifact, save_artifact
 from nsefc.models.estimators import (

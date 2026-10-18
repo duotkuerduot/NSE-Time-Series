@@ -1,4 +1,4 @@
-"""Metrics (§11.3). Errors are in return space, so |e| is the miss as a share of last close.
+"""Metrics. Errors are in return space, so |e| is the miss as a share of the last close.
 
 * MAE skill against the no-change guess, pooled over all (security, session) rows: primary.
 * Diebold-Mariano: one-sided, on the daily cross-sectional mean loss differential, with a

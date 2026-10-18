@@ -1,4 +1,4 @@
-"""Layered settings (§14): default.yaml, a profile overlay, NSEFC_DATA_DIR, then overrides."""
+"""Layered settings: default.yaml, a profile overlay, NSEFC_DATA_DIR, then overrides."""
 
 from __future__ import annotations
 
@@ -30,6 +30,7 @@ def test_sample_profile_shortens_the_periods(repo_root: Path) -> None:
 def test_paths_resolve_against_the_project_root(repo_root: Path) -> None:
     settings = load_settings("default", project_root=repo_root, environ={})
     assert settings.data_dir == repo_root / "data"
+    assert settings.source_dir == repo_root / "data" / "source"
     assert settings.citation_file == repo_root / "reference" / "mendeley.yaml"
     assert settings.holidays_file.is_file()
     assert settings.site_file.is_file()
@@ -40,6 +41,18 @@ def test_data_dir_environment_override(repo_root: Path, tmp_path: Path) -> None:
         "default", project_root=repo_root, environ={"NSEFC_DATA_DIR": str(tmp_path)}
     )
     assert settings.data_dir == tmp_path
+    assert settings.source_dir == tmp_path / "source"  # the dataset moves with the data folder
+
+
+def test_source_dir_can_point_elsewhere(repo_root: Path, tmp_path: Path) -> None:
+    settings = load_settings(
+        "default", project_root=repo_root, environ={}, overrides={"paths.source_dir": "downloads"}
+    )
+    assert settings.source_dir == repo_root / "downloads"
+    absolute = load_settings(
+        "default", project_root=repo_root, environ={}, overrides={"paths.source_dir": tmp_path}
+    )
+    assert absolute.source_dir == tmp_path
 
 
 def test_overrides_win(repo_root: Path) -> None:

@@ -1,4 +1,4 @@
-"""Volatility-scaled split conformal intervals (§12).
+"""Volatility-scaled split conformal intervals.
 
 1. sigma = EWMA volatility of the security's returns up to T, floored at 0.25%.
 2. Scores s = (y - y_hat) / sigma from the most recent 250 sessions of out-of-sample

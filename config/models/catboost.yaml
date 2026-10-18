@@ -1,4 +1,4 @@
-# M3 CatBoost (§10.2), full profile only (`uv run --extra full nsefc run --profile full`).
+# CatBoost, full profile only (`uv run --extra full nsefc run --profile full`).
 label: "CatBoost"
 frozen:
   loss_function: MAE

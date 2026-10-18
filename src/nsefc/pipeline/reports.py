@@ -1,4 +1,4 @@
-"""Markdown reports: the data audit (§6.4) and the evaluation report (§11.5 step 4)."""
+"""Markdown reports: the data audit and the evaluation report."""
 
 from __future__ import annotations
 

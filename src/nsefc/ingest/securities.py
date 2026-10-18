@@ -1,4 +1,4 @@
-"""Securities, aliases and instrument types (§6.5).
+"""Securities, aliases and instrument types.
 
 ``reference/securities.csv`` is reviewed by hand. It maps former tickers to current ones (the
 2007-2012 files use old codes such as BBK for what is now ABSA) and records instrument types.

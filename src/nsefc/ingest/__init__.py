@@ -1,4 +1,4 @@
-"""Stage 2, ingest (§6): reader, corrections, aliases, panel rules and quality checks."""
+"""Stage 2, ingest: reader, corrections, aliases, panel rules and quality checks."""
 
 from nsefc.ingest.corrections import CorrectionError, load_corrections
 from nsefc.ingest.reader import SchemaError

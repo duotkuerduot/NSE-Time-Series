@@ -1,4 +1,4 @@
-"""The target (§9): the next-session simple return.
+"""The target: the next-session simple return.
 
     y(i, T) = C(i, T+1) / C(i, T) - 1,   T+1 = the next held session in which i is listed
 
@@ -39,5 +39,5 @@ def next_session_labels(bars: pd.DataFrame) -> pd.DataFrame:
 
 
 def winsorise(y: np.ndarray, limit: float) -> np.ndarray:
-    """Clip training labels at ±limit (§9: ±10.5%)."""
+    """Clip training labels at ±limit (±10.5% by default)."""
     return np.asarray(np.clip(y, -limit, limit), dtype=float)

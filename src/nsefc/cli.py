@@ -1,4 +1,4 @@
-"""The ``nsefc`` command line (§3).
+"""The ``nsefc`` command line.
 
 ``uv run nsefc run`` does everything: acquire, ingest, train and evaluate, predict, publish,
 then serve the app in the browser. Each stage is also a subcommand.
@@ -57,7 +57,7 @@ Profile = Annotated[
 Sample = Annotated[bool, typer.Option("--sample", help="Use the synthetic sample dataset")]
 SourceDir = Annotated[
     Path | None,
-    typer.Option("--source-dir", help="Read dataset files from this folder instead of 'NSE Data'"),
+    typer.Option("--source-dir", help="Read the dataset files from this folder, not data/source"),
 ]
 Force = Annotated[bool, typer.Option("--force", help="Recompute every stage even if cached")]
 NoBrowser = Annotated[bool, typer.Option("--no-browser", help="Do not open a browser")]
@@ -104,7 +104,7 @@ def _context(
     )
 
 
-# §3.3: the exit code for an unexpected failure inside each stage.
+# The exit code for an unexpected failure inside each stage.
 STAGE_EXIT = {"acquire": 10, "ingest": 20, "train": 30, "predict": 30, "publish": 40}
 
 
@@ -114,7 +114,7 @@ def _fail(exc: StageError) -> typer.Exit:
 
 
 def _stage(ctx: RunContext, name: str, call: Callable[[], StageOutcome]) -> StageOutcome:
-    """Run one stage; an unexpected exception becomes a StageError with §3.3's exit code."""
+    """Run one stage; an unexpected exception becomes a StageError with the stage's exit code."""
     try:
         return call()
     except StageError:
@@ -381,7 +381,7 @@ def serve(no_browser: NoBrowser = False, port: Port = None) -> None:
 def import_command(
     file: Annotated[Path, typer.Argument(help="CSV with date, ticker, close, volume")],
 ) -> None:
-    """Add sessions you collected after the dataset's last session (§5.5)."""
+    """Add sessions you collected after the dataset's last session."""
     from nsefc.acquire import Manifest, ManifestFile, read_manifest, write_manifest
     from nsefc.domain import SourceKind
     from nsefc.ingest import SchemaError, read_import_file
@@ -520,7 +520,7 @@ def web_hash(
         bool, typer.Option("--check", help="Fail if the committed build is stale")
     ] = False,
 ) -> None:
-    """SHA-256 over the frontend sources, to keep src/nsefc/web_dist in step (§15.4)."""
+    """SHA-256 over the frontend sources, to keep src/nsefc/web_dist in step."""
     from nsefc.devtools import HASH_FILE, committed_web_hash, web_source_hash
 
     root = _settings().project_root
@@ -539,7 +539,7 @@ def web_hash(
 
 @dev_app.command("update-readme")
 def update_readme_command() -> None:
-    """Insert the latest results between the README's results markers (§18)."""
+    """Insert the latest results between the README's results markers."""
     from nsefc.devtools import results_block, update_readme
 
     ctx = _context()
@@ -598,7 +598,7 @@ def tune_command(
     ] = "ridge,huber,lightgbm",
 ) -> None:
     """Tune the candidates on the tuning period only and print values to freeze in
-    config/models/ (§10.2). Needs the full extra: `uv run --extra full nsefc dev tune`."""
+    config/models/. Needs the full extra: `uv run --extra full nsefc dev tune`."""
     import yaml
 
     from nsefc.models import ModelUnavailable

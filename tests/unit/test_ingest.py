@@ -1,4 +1,4 @@
-"""Reader golden files, corrections and the ingest stage (§6, §16.1)."""
+"""Reader golden files, corrections and the ingest stage."""
 
 from __future__ import annotations
 
@@ -295,7 +295,7 @@ def test_a_redate_onto_existing_rows_stops_the_ingest(
         run_ingest([src], calendar, reference)
 
 
-# ---------------------------------------------------------------- imports (§5.5)
+# ---------------------------------------------------------------- imports
 IMPORT = "date,ticker,close,volume\n2025-01-08,KUKZ,396,700\n2025-01-08,EGAD,13,0\n"
 
 

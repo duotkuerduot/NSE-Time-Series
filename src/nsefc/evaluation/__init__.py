@@ -1,4 +1,4 @@
-"""Walk-forward evaluation (§11): the modelling table, the harness and the metrics."""
+"""Walk-forward evaluation: the modelling table, the harness and the metrics."""
 
 from nsefc.evaluation.dataset import (
     ModelData,

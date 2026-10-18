@@ -1,4 +1,4 @@
-"""The local server (§15.5): Python standard library only.
+"""The local server: Python standard library only.
 
 * Binds to 127.0.0.1 only; if the port is busy, tries the next ones and reports the one used.
 * ``/api/v1/*`` comes from ``data/api/v1/`` as JSON with ``Cache-Control: no-store``.
@@ -51,7 +51,7 @@ SECURITY_HEADERS = {
 
 class LocalServer(ThreadingHTTPServer):
     # On Windows SO_REUSEADDR lets a second server bind a port that is already in use, so a
-    # busy port would go unnoticed; turn it off there (§15.5 rule 1).
+    # busy port would go unnoticed; turn it off there.
     allow_reuse_address = os.name != "nt"
     daemon_threads = True
 
@@ -207,6 +207,6 @@ def make_server(
 
 
 def open_browser(url: str, opener: Callable[[str], bool] = webbrowser.open) -> None:
-    # A missing or broken browser must never stop the server (§15.5 rule 6).
+    # A missing or broken browser must never stop the server.
     with contextlib.suppress(Exception):
         opener(url)

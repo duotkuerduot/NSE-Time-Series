@@ -1,4 +1,4 @@
-"""Maintainer tools: the web build hash (§15.4) and the README results block (§18)."""
+"""Maintainer tools: the web build hash and the README results block."""
 
 from __future__ import annotations
 
@@ -43,61 +43,87 @@ def _pct(value: Any, digits: int = 1, signed: bool = True) -> str:
     return f"{value:+.{digits}%}" if signed else f"{value:.{digits}%}"
 
 
+def _source_phrase(ingest: dict[str, Any]) -> str:
+    dataset = ingest.get("dataset", {})
+    if dataset.get("source") == "mendeley":
+        return "the NSE daily prices from Mendeley Data"
+    if dataset.get("source") == "sample":
+        return "the synthetic sample dataset"
+    return str(dataset.get("title", "the dataset"))
+
+
+def _closest(model: dict[str, Any]) -> str:
+    """How close the best machine-learning model came, and which gates stopped it."""
+    sel, hold = model["selection"], model.get("holdout") or {}
+    failed = [
+        f"{g['id']} ({g.get('name', g['id']).lower()})" for g in model["gates"] if not g["passed"]
+    ]
+    text = (
+        f" The closest machine-learning model was {model['label']}, with a selection skill of "
+        f"{_pct(sel['skill'], 2)} (DM p = {sel['dm_p']:.3f}) and a holdout skill of "
+        f"{_pct(hold.get('skill'), 2)}"
+    )
+    if failed:
+        text += ", but it failed " + ", ".join(failed[:-1])
+        text += (" and " if len(failed) > 1 else "") + failed[-1]
+    return text + "."
+
+
 def results_block(evaluation: dict[str, Any], ingest: dict[str, Any]) -> str:
-    """The README's results section (§18 item 3), from the latest maintainer run."""
+    """The README's results section, from the latest maintainer run."""
     champion = evaluation["champion"]
     models = {m["model_id"]: m for m in evaluation["models"]}
+    selection = evaluation["periods"]["selection"]
     hold_start, hold_end = evaluation["periods"]["holdout"]
-    dataset = ingest.get("dataset", {})
     universe = evaluation.get("universe", {})
-    lines = [
-        f"From `uv run nsefc run` on {dataset.get('title', 'the dataset')} "
-        f"({ingest['first_session']} to {ingest['last_session']}), default profile. Choices "
-        f"used the selection period ({evaluation['periods']['selection'][0]} to "
-        f"{evaluation['periods']['selection'][1]}); the holdout ({hold_start} to {hold_end}) "
-        "was never used to choose anything.",
-        "",
-    ]
-    champ = models[champion["model_id"]]
-    hold = champ.get("holdout") or {}
     stocks = (
         f"{universe['min']} to {universe['max']} liquid NSE stocks (median {universe['median']})"
         if universe
         else "the liquid NSE stocks"
     )
-    if champion["model_id"] != "B0" and hold:
-        lines += [
-            f"**Champion: {champion['label']}.** {champion['reason']}. On the holdout its "
-            f"average miss was {_pct(hold['mae'], 2, False)} of the price, against "
-            f"{_pct(hold['mae_b0'], 2, False)} for a no-change guess (skill "
-            f"{_pct(hold['skill'], 2)}, DM p = {hold['dm_p']:.3f}), across {stocks}. The actual "
-            f"close fell inside its 80% range {_pct(hold['coverage'], 1, False)} of the time.",
-            "",
-        ]
-    else:
-        lines.append(
-            "**Champion: the no-change guess.** No model beat it by the margins the gates "
-            "require, so the app shows the no-change guess and says so. On this data that is "
-            "the honest result."
+    lines = [
+        f"From `uv run nsefc run` on {_source_phrase(ingest)} ({ingest['first_session']} to "
+        f"{ingest['last_session']}), {evaluation.get('profile', 'default')} profile. The models "
+        f"are compared on the selection period ({selection[0]} to {selection[1]}); the holdout "
+        f"({hold_start} to {hold_end}) only confirms the choice and was never used to make it.",
+        "",
+    ]
+    champ = models[champion["model_id"]]
+    hold = champ.get("holdout") or {}
+    ml = [m for m in evaluation["models"] if not m["model_id"].startswith("B")]
+    best = max(ml, key=lambda m: m["selection"]["skill"], default=None)
+    if not champion["model_id"].startswith("B"):
+        text = f"**Champion: {champion['label']}.** It passed every gate."
+        if hold:
+            text += (
+                f" On the holdout its average miss was {_pct(hold.get('mae'), 2, False)} of the "
+                f"price, against {_pct(hold.get('mae_b0'), 2, False)} for the no-change guess "
+                f"(skill {_pct(hold.get('skill'), 2)}, DM p = {hold.get('dm_p', math.nan):.3f})."
+            )
+    elif champion["model_id"] == "B0":
+        text = (
+            "**Champion: the no-change guess.** No model beat it by the margins the gates set in "
+            "advance, so the framework correctly refused to ship models that did not beat a "
+            "strong baseline."
         )
-        ml = [m for m in evaluation["models"] if not m["model_id"].startswith("B")]
-        best = max(ml, key=lambda m: m["selection"]["skill"], default=None)
-        if best is not None:
-            sel, h = best["selection"], best.get("holdout") or {}
-            lines[-1] += (
-                f" The strongest machine-learning model, {best['label']}, reduced the average miss "
-                f"by {_pct(sel['skill'], 2, False)} in the selection period (DM p = "
-                f"{sel['dm_p']:.3f}) and {_pct(h.get('skill'), 2, False)} on the holdout, "
-                "short of the 1% the gates ask for."
-            )
-        if hold.get("coverage") is not None:
-            lines[-1] += (
-                f" The 80% range contained the actual close {_pct(hold['coverage'], 1, False)} "
-                f"of the time on the holdout, across {stocks}."
-            )
-        lines.append("")
+        text += _closest(best) if best is not None else ""
+    else:
+        text = (
+            f"**Champion: the {champion['label']}.** No machine-learning model beat the simple "
+            "baselines by the margins the gates set in advance, so the framework correctly "
+            f"refused to ship them and chose the {champion['label']}, which beat the no-change "
+            f"guess with a holdout skill of {_pct(hold.get('skill'), 2)}."
+        )
+        text += _closest(best) if best is not None else ""
+    if hold.get("coverage") is not None:
+        text += (
+            f" The champion's 80% range contained the actual close "
+            f"{_pct(hold['coverage'], 1, False)} of the time on the holdout, across {stocks}."
+        )
     lines += [
-        "| Model | Selection skill | DM p | Holdout skill | 80% range coverage | Gates (§11.4) |",
+        text,
+        "",
+        "| Model | Selection skill | DM p | Holdout skill | 80% range coverage | Gates |",
         "| --- | --- | --- | --- | --- | --- |",
     ]
     for m in evaluation["models"]:
@@ -114,11 +140,20 @@ def results_block(evaluation: dict[str, Any], ingest: dict[str, Any]) -> str:
             f"{_pct(h.get('skill'), 2)} | "
             f"{_pct(sel['coverage'], 1, False)} | {gates} |"
         )
+    b0_mae = (models.get("B0") or {}).get("selection", {}).get("mae")
+    example = (
+        f" (an average miss of {_pct(b0_mae * 0.99, 3, False)} of the price instead of "
+        f"{_pct(b0_mae, 3, False)})"
+        if isinstance(b0_mae, int | float) and math.isfinite(b0_mae)
+        else ""
+    )
     lines += [
         "",
-        "Skill is 1 - (model's average miss / no-change guess's average miss): positive means the "
-        'model missed by less. It is never an "accuracy" percentage of the price. Coverage is for '
-        "the selection period; the gates are defined in [ENGINEERING.md](ENGINEERING.md) §11.4.",
+        "Skill is 1 − (the model's average miss ÷ the no-change guess's average miss), so +1% "
+        f"means a miss 1% smaller than the no-change guess's{example} and a negative skill means "
+        "a larger one. DM p is the one-sided Diebold–Mariano p-value for that difference. "
+        "Coverage is for the selection period. [docs/methodology.md](docs/methodology.md#gates) "
+        "defines the gates, and [docs/results.md](docs/results.md) has the full results.",
     ]
     return "\n".join(lines)
 

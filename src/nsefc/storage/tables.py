@@ -1,4 +1,4 @@
-"""Parquet tables with plain dates (§6.2: ``session_date`` is a date, never a timestamp).
+"""Parquet tables with plain dates: ``session_date`` is a date, never a timestamp.
 
 Columns named ``*_date`` or ``*_session`` are stored as Arrow ``date32`` and come back as
 ``datetime64`` columns, which is what pandas groups, sorts and compares fastest.

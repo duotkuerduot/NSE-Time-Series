@@ -1,4 +1,4 @@
-"""Data-quality checks (§6.6).
+"""Data-quality checks.
 
 Severity ``error`` blocks the run (exit code 20), ``exclude`` drops rows from modelling (they
 stay in the display data) and ``warn`` is reported only. Every result carries a count and a
@@ -9,7 +9,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-import numpy as np
 import pandas as pd
 
 from nsefc.domain import Severity
@@ -129,7 +128,7 @@ def dat02(off_calendar: list[pd.Timestamp]) -> CheckResult:
 
 
 def prc01(bars: pd.DataFrame, threshold: float) -> tuple[pd.Series, CheckResult]:
-    """PRC-01: an absolute move beyond the band (+0.5 pp) is an event (§6.7)."""
+    """PRC-01: an absolute move beyond the band (+0.5 pp) is an event."""
     ordered = bars.sort_values(["ticker", "session_date"])
     previous = ordered.groupby("ticker")["close"].shift(1)
     change = ordered["close"] / previous - 1
@@ -224,7 +223,3 @@ def missing_ranges(sessions: pd.DataFrame) -> list[tuple[str, str, int]]:
 
 def errors(results: list[CheckResult]) -> list[CheckResult]:
     return [r for r in results if r.severity is Severity.ERROR and r.failed]
-
-
-def as_float(values: pd.Series) -> np.ndarray:
-    return values.to_numpy(dtype=float)

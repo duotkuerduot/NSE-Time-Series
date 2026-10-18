@@ -1,5 +1,5 @@
 // Every user-visible sentence lives here, or in the About page's prose, so one test can enforce
-// the language rules (ENGINEERING.md §15.3). Words such as "buy", "sell", "hold", "signal" and
+// the language rules. Words such as "buy", "sell", "hold", "signal" and
 // "target price" never appear.
 import { formatSessionDate } from "./format";
 
@@ -71,7 +71,7 @@ export const COPY = {
   pageNotFound: "This page does not exist.",
   dataCredit: "Data:",
   dataOrigin: "Daily prices from the Nairobi Securities Exchange, as compiled in the dataset cited above.",
-  builtBy: (owner: string) => `Built by ${owner}`,
+  builtBy: (name: string) => `Built by ${name}`,
   contactInvite: "Questions, ideas and collaboration are welcome.",
   sampleNotice: "Showing synthetic sample data. Run without --sample to use real NSE data.",
 } as const;

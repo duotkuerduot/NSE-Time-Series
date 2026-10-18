@@ -1,4 +1,4 @@
-"""Reader for the Mendeley "NSE All Stocks Prices" CSV format (docs/data/mendeley-dataset.md).
+"""Reader for the Mendeley "NSE All Stocks Prices" CSV format (data/README.md).
 
 Every daily price file has one row per security per session with these columns (header case
 varies between files): ``Date, Code, Name, 12m Low, 12m High, Day Low, Day High, Day Price,
@@ -8,7 +8,7 @@ and ``-`` means "none" (a volume of ``-`` means the security did not trade). Ind
 share the files, with codes starting with ``^``.
 
 The reader keeps every row's file and line number, so corrections and the data audit can point
-at the exact source of each value (G-5).
+at the exact source of each value.
 """
 
 from __future__ import annotations

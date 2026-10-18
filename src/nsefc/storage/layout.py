@@ -1,4 +1,4 @@
-"""Where everything lives under ``data/`` (§6.1). One place, so no stage guesses a path."""
+"""Where everything lives under ``data/``. One place, so no stage guesses a path."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from pathlib import Path
 class DataLayout:
     root: Path
 
-    # raw downloads and imports, never modified
+    # raw copies and imports, never modified
     @property
     def raw(self) -> Path:
         return self.root / "raw"
@@ -74,5 +74,5 @@ class DataLayout:
         return self.runs / "latest.json"
 
     def stamp(self, stage: str) -> Path:
-        """The fingerprint record a stage leaves beside its outputs (§19 step 3)."""
+        """The fingerprint record a stage leaves beside its outputs."""
         return self.root / "stamps" / f"{stage}.json"

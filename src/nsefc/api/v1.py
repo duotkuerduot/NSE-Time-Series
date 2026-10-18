@@ -1,8 +1,8 @@
-"""API contract v1.1: every static file the frontend reads (ENGINEERING.md §13).
+"""API contract v1.1: every static file the frontend reads.
 
 These models validate every published file before it is written, export JSON Schema to
 ``contracts/api/v1`` and generate the frontend's TypeScript types, so the two sides cannot
-drift apart silently. v1.1 (local-first, §13.3) adds ``data_mode`` and ``dataset`` to the
+drift apart silently. v1.1 (the local tool) adds ``data_mode`` and ``dataset`` to the
 status, makes ``stale_after`` nullable, adds ``target_in_past`` and ``target_from_calendar``
 to the latest forecast, and adds ``report.json`` and ``site.json``.
 """
@@ -37,15 +37,15 @@ class _Resource(BaseModel):
     )
 
 
-def _same_length(owner: str, **series: list[object]) -> None:
+def _same_length(where: str, **series: list[object]) -> None:
     lengths = {name: len(values) for name, values in series.items()}
     if len(set(lengths.values())) > 1:
-        raise ValueError(f"{owner}: series lengths differ {lengths}")
+        raise ValueError(f"{where}: series lengths differ {lengths}")
 
 
-def _ascending(owner: str, dates: list[date]) -> None:
+def _ascending(where: str, dates: list[date]) -> None:
     if any(b <= a for a, b in pairwise(dates)):
-        raise ValueError(f"{owner}: dates must be strictly ascending")
+        raise ValueError(f"{where}: dates must be strictly ascending")
 
 
 # ---------------------------------------------------------------------------- shared parts
@@ -87,7 +87,7 @@ class DatasetInfo(_Resource):
 
 
 class Status(_Resource):
-    """Pointer to the current release, plus run and data status (§13.3)."""
+    """Pointer to the current release, plus run and data status."""
 
     api_version: Literal["1"] = API_VERSION
     contract_version: Literal["1.1"] = CONTRACT_VERSION
@@ -265,7 +265,7 @@ class PredictionHistoryRow(_Resource):
     error_pct: Fraction | None
     direction: DirectionOutcome | None
     in_range: bool | None
-    model_id: str = Field(description="The model that made this forecast (review FE-4)")
+    model_id: str = Field(description="The model that made this forecast")
 
 
 class StockPrediction(_Resource):
@@ -345,7 +345,7 @@ class Breadth(_Resource):
 
 
 class TrackRecordSeries(_Resource):
-    """Rolling 60-session record of forecasts as published (review FE-4)."""
+    """Rolling 60-session record of forecasts as published."""
 
     dates: list[date]
     model_mae_pct_60: list[ErrorSize]
@@ -401,7 +401,7 @@ class ReportUniverse(_Resource):
 
 
 class ReportGate(_Resource):
-    id: str = Field(description="Gate id from ENGINEERING.md §11.4, e.g. G-SKILL")
+    id: str = Field(description="Gate id, e.g. G-SKILL (docs/methodology.md, Gates)")
     name: str = Field(description="Plain-language name shown in the app")
     passed: bool
     detail: str
@@ -446,7 +446,7 @@ class DataAudit(_Resource):
 
 
 class Report(_Resource):
-    """Evaluation results for the About page (§13.3 item 4)."""
+    """Evaluation results for the About page."""
 
     profile: Literal["default", "full"]
     refit: str
@@ -466,7 +466,7 @@ class SiteLink(_Resource):
 
 
 class Site(_Resource):
-    """Owner name and contact links from config/site.yaml, plus dataset attribution."""
+    """The builder's name and contact links from config/site.yaml, plus dataset attribution."""
 
     owner_name: str
     tagline: str

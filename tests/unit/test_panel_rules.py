@@ -1,4 +1,4 @@
-"""Panel rules (§6.3): classify from observed rows first, then synthesise held sessions only."""
+"""Panel rules: classify from observed rows first, then synthesise held sessions only."""
 
 from __future__ import annotations
 

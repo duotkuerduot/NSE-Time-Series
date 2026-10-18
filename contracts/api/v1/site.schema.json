@@ -22,7 +22,7 @@
     }
   },
   "additionalProperties": false,
-  "description": "Owner name and contact links from config/site.yaml, plus dataset attribution.",
+  "description": "The builder's name and contact links from config/site.yaml, plus dataset attribution.",
   "properties": {
     "owner_name": {
       "title": "Owner Name",

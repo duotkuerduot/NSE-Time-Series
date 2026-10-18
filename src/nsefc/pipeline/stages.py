@@ -1,10 +1,10 @@
-"""The six stages and their caching (§1.1, §19).
+"""The six stages and their caching.
 
 Each stage declares its inputs, computes a fingerprint over them (file hashes, the relevant
-settings and the package version), skips itself when its outputs exist with the same
-fingerprint (unless ``--force``), writes outputs somewhere temporary before moving them into
-place, and logs JSON lines to ``data/runs/<run_id>/log.jsonl``. A failed stage leaves earlier
-outputs untouched, so a fixed rerun resumes where it stopped.
+settings, the package version and the code it depends on), skips itself when its outputs
+exist with the same fingerprint (unless ``--force``), writes outputs somewhere temporary
+before moving them into place, and logs JSON lines to ``data/runs/<run_id>/log.jsonl``. A
+failed stage leaves earlier outputs untouched, so a fixed rerun resumes where it stopped.
 """
 
 from __future__ import annotations
@@ -20,7 +20,7 @@ import pandas as pd
 from nsefc.acquire import (
     AcquireError,
     AcquireResult,
-    Manifest,
+    SourceMissingError,
     acquire_dataset,
     acquire_local,
     acquire_sample,
@@ -30,7 +30,6 @@ from nsefc.acquire import (
     write_active,
 )
 from nsefc.api.v1 import CONTRACT_VERSION
-from nsefc.domain import SourceKind
 from nsefc.evaluation import ModelData
 from nsefc.ingest import CorrectionError, SchemaError, SourceFiles, ingest
 from nsefc.models import ArtifactError, ModelUnavailable, load_artifact
@@ -100,6 +99,29 @@ def _out(ctx: RunContext, stamp: Stamp, key: str) -> Path:
 
 
 # ---------------------------------------------------------------- 1. acquire
+def _shown(ctx: RunContext, path: Path) -> str:
+    """A path as messages and manifests show it: relative to the project when inside it."""
+    try:
+        return path.resolve().relative_to(ctx.settings.project_root.resolve()).as_posix()
+    except ValueError:
+        return str(path)
+
+
+def _source_help(ctx: RunContext, source_dir: Path | None) -> str:
+    """What to do when the dataset files are not where acquire looked."""
+    if source_dir is not None:
+        return (
+            "Check the --source-dir folder, or use `--sample` to try the app with synthetic data."
+        )
+    folder = _shown(ctx, ctx.settings.source_dir)
+    return (
+        "The dataset is not part of the repository. Download the price files from Mendeley Data "
+        f"and put them in {folder}/ (data/README.md lists the collections and files). Or use "
+        "`--source-dir PATH` to read another folder of the same files, or `--sample` to try the "
+        "app with synthetic data."
+    )
+
+
 def stage_acquire(
     ctx: RunContext, *, source_dir: Path | None = None, sample: bool = False
 ) -> StageOutcome:
@@ -112,14 +134,12 @@ def stage_acquire(
             result = acquire_local(raw, source_dir)
         else:
             citation = load_citation(ctx.settings.citation_file)
-            result = acquire_dataset(raw, ctx.settings.project_root, citation)
+            folder = ctx.settings.source_dir
+            result = acquire_dataset(raw, folder, citation, origin=_shown(ctx, folder))
+    except SourceMissingError as exc:
+        raise StageError(f"{exc}\n{_source_help(ctx, source_dir)}", 10) from exc
     except AcquireError as exc:
-        raise StageError(
-            f"{exc}\nThe dataset ships in the repository's 'NSE Data' folder. Use "
-            "`--source-dir PATH` for another folder of the same files, or `--sample` to try "
-            "the app with synthetic data.",
-            10,
-        ) from exc
+        raise StageError(str(exc), 10) from exc
     write_active(raw, result)
     manifests = result.manifest_objects()
     files = sum(len(m.files) for m in manifests)
@@ -300,7 +320,6 @@ def train_fingerprint(ctx: RunContext, features_fp: str, profile: str | None = N
             "targets",
             "runtime",
             "model_specs",
-            "baselines",
             "quality",
         ),
         code_hash("train"),
@@ -442,7 +461,7 @@ def stage_publish(ctx: RunContext, *, today: date | None = None) -> StageOutcome
     predict = read_stamp(layout, "predict")
     if predict is None or predict.fingerprint != _predict_fingerprint(ctx, train):
         raise StageError("no current forecast: run `nsefc predict` (or `nsefc run`) first", 2)
-    # "Today" on the user's machine (§13.3): the local date, not the UTC one.
+    # "Today" on the user's machine: the local date, not the UTC one.
     today = today or datetime.now(UTC).astimezone().date()
     s = ctx.settings
     fingerprint = ctx.fingerprint(
@@ -498,7 +517,3 @@ def stage_publish(ctx: RunContext, *, today: date | None = None) -> StageOutcome
         f"{count:,} files",
         {"release_id": release_id, "files": count},
     )
-
-
-def manifest_source(manifest: Manifest) -> SourceKind:
-    return manifest.source

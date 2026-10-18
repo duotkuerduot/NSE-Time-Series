@@ -1,5 +1,0 @@
-# Baselines (§10.1). They run in the same harness as the ML candidates and can be champion.
-B0: {label: "No-change guess"}
-B1: {label: "Drift baseline", window: 250}            # trailing mean return of the security
-B2: {label: "5-session average baseline", window: 5}   # SMA_5(T) / C_T - 1
-B3: {label: "AR(1) baseline", window: 500, fit: lad}   # per security, refit with each model refit

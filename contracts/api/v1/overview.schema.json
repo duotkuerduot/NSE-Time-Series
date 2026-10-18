@@ -252,7 +252,7 @@
     },
     "TrackRecordSeries": {
       "additionalProperties": false,
-      "description": "Rolling 60-session record of forecasts as published (review FE-4).",
+      "description": "Rolling 60-session record of forecasts as published.",
       "properties": {
         "dates": {
           "items": {

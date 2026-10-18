@@ -1,4 +1,4 @@
-"""Gates and champion selection (§11.4, §11.5)."""
+"""Gates and champion selection."""
 
 from nsefc.selection.gates import (
     GATE_ORDER,

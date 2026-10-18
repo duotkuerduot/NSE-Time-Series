@@ -1,5 +1,5 @@
 # `--sample`: the synthetic dataset (2015-2024, 30 fictional tickers). Shorter periods and a
-# shorter history requirement so the whole run takes under two minutes (§16.3).
+# shorter history requirement so the whole run takes under two minutes.
 periods:
   tuning: ["2016-01-01", "2016-12-31"]
   selection: ["2018-01-01", "2020-12-31"]

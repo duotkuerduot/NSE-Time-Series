@@ -1,7 +1,6 @@
-// Every page renders from the contract fixtures (contracts/api/v1/fixtures), plus the v1.1
-// changes in ENGINEERING.md §15.2 and §16.4: the data-through label, no stale banner when
-// stale_after is null, the target_in_past line, the Results section, contact links, and the
-// sample notice.
+// Every page renders from the contract fixtures (contracts/api/v1/fixtures), plus what the
+// local tool adds: the data-through label, no stale banner when stale_after is null, the
+// target_in_past line, the Results section, contact links, and the sample notice.
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";

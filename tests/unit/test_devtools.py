@@ -1,4 +1,4 @@
-"""Maintainer tools: the web build hash (§15.4) and the README results block (§18)."""
+"""Maintainer tools: the web build hash and the README results block."""
 
 from __future__ import annotations
 
@@ -60,12 +60,36 @@ INGEST = {
 }
 
 
-def test_results_block_never_says_accuracy_of_price() -> None:
+def test_results_block_reports_skill_against_the_no_change_guess() -> None:
     block = results_block(EVALUATION, INGEST)
     assert "**Champion: the no-change guess.**" in block
-    assert "The strongest machine-learning model, LightGBM" in block
+    assert "the framework correctly refused to ship models" in block
+    assert "The closest machine-learning model was LightGBM" in block
+    assert "but it failed G-SKILL (g-skill)." in block
     assert "| LightGBM | +0.14% | 0.069 | +0.46% | 80.0% | failed G-SKILL |" in block
-    assert 'never an "accuracy" percentage' in block
+    assert "accura" not in block.lower()
+    assert "predicts" not in block.lower()
+
+
+def test_results_block_names_a_baseline_champion() -> None:
+    evaluation = {
+        **EVALUATION,
+        "champion": {"model_id": "B3", "label": "AR(1) baseline", "reason": "beat B0"},
+        "models": [
+            *EVALUATION["models"],  # type: ignore[list-item]
+            {
+                "model_id": "B3",
+                "label": "AR(1) baseline",
+                "gates": [{"id": "G-SKILL", "passed": True}],
+                "selection": {"skill": 0.012, "dm_p": 0.01, "coverage": 0.8},
+                "holdout": {"skill": 0.011, "coverage": 0.79},
+            },
+        ],
+    }
+    block = results_block(evaluation, INGEST)
+    assert "**Champion: the AR(1) baseline.**" in block
+    assert "refused to ship them and chose the AR(1) baseline" in block
+    assert "range contained the actual close 79.0% of the time" in block
 
 
 def test_update_readme_between_markers(tmp_path: Path) -> None:

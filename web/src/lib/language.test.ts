@@ -1,6 +1,6 @@
-// Language rules (ENGINEERING.md 24.7), with the review's MF-10 fix: whole words and phrases,
-// not substrings, so "threshold", "Holdings" and "uncertainty" do not trip the test, while
-// "buy", "hold" or "target price" anywhere in the UI source fails the build.
+// Language rules: whole words and phrases, not substrings, so "threshold", "Holdings" and
+// "uncertainty" do not trip the test, while "buy", "hold" or "target price" anywhere in the UI
+// source fails the build.
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";

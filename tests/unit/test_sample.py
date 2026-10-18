@@ -1,4 +1,4 @@
-"""The synthetic sample dataset (§16.3): deterministic, fictional, with planted defects."""
+"""The synthetic sample dataset: deterministic, fictional, with planted defects."""
 
 from __future__ import annotations
 

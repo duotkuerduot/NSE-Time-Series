@@ -1,9 +1,10 @@
-"""Settings: one validated file of tunables (ENGINEERING.md §14).
+"""Settings: one validated file of tunables.
 
 ``config/default.yaml`` holds every value. ``--sample`` loads ``config/sample.yaml`` over it and
 the test suite loads ``config/test.yaml``. Explicit overrides (CLI flags) come last. Unknown keys
 and invalid values stop the run before it does anything. There are no secrets and no required
-environment variables; ``NSEFC_DATA_DIR`` may move the data folder.
+environment variables; ``NSEFC_DATA_DIR`` may move the data folder, and
+``paths.source_dir`` the dataset files.
 """
 
 from __future__ import annotations
@@ -22,7 +23,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 Profile = Literal["default", "sample", "test"]
 RefitFrequency = Literal["monthly", "quarterly", "semiannual", "annual"]
 Candidate = Literal["ridge", "huber", "lightgbm", "catboost"]
-MODEL_FILES = ("baselines", "ridge", "huber", "lightgbm", "catboost")
+MODEL_FILES = ("ridge", "huber", "lightgbm", "catboost")
 
 
 class ConfigError(RuntimeError):
@@ -50,6 +51,7 @@ class _Strict(BaseModel):
 
 class PathSettings(_Strict):
     data_dir: Path = Path("data")
+    source_dir: Path | None = None  # the dataset files; None means <data_dir>/source
 
 
 class DatasetSettings(_Strict):
@@ -69,7 +71,7 @@ class QualitySettings(_Strict):
 
     @property
     def event_threshold(self) -> float:
-        """An absolute move above this is an event (PRC-01, §6.7)."""
+        """An absolute move above this is an event (PRC-01)."""
         return self.band + self.event_margin
 
 
@@ -134,7 +136,7 @@ class IntervalSettings(_Strict):
 
 
 class GateSettings(_Strict):
-    """§11.4, fixed before results are seen (changing one afterwards needs the owner, §0.6)."""
+    """The gate thresholds, fixed before results are seen and never changed because of them."""
 
     skill_min: float = Field(0.01, gt=-1, lt=1)
     skill_p_max: float = Field(0.05, gt=0, lt=1)
@@ -164,7 +166,6 @@ class ProfileSettings(_Strict):
 
 class ModelSettings(_Strict):
     b1_window: int = Field(250, ge=5)
-    b2_window: int = Field(5, ge=2)
     b3_window: int = Field(500, ge=20)
     early_stopping_share: float = Field(0.10, gt=0, lt=0.5)
 
@@ -217,11 +218,19 @@ class Settings(_Strict):
     serve: ServeSettings = ServeSettings()
     runtime: RuntimeSettings = RuntimeSettings()
     model_specs: dict[str, ModelSpec] = Field(default_factory=dict)
-    baselines: dict[str, dict[str, Any]] = Field(default_factory=dict)
 
     @property
     def data_dir(self) -> Path:
         path = self.paths.data_dir
+        return path if path.is_absolute() else self.project_root / path
+
+    @property
+    def source_dir(self) -> Path:
+        """The folder the dataset files are read from: ``paths.source_dir``, else
+        ``<data_dir>/source``."""
+        path = self.paths.source_dir
+        if path is None:
+            return self.data_dir / "source"
         return path if path.is_absolute() else self.project_root / path
 
     @property
@@ -243,7 +252,7 @@ class Settings(_Strict):
         return path if path.is_absolute() else self.project_root / path
 
     def section_hash(self, *names: str) -> str:
-        """SHA-256 of the named sections, for stage fingerprints (§19)."""
+        """SHA-256 of the named sections, for stage fingerprints."""
         dumped = self.model_dump(mode="json", include=set(names))
         canonical = json.dumps(dumped, sort_keys=True, separators=(",", ":"))
         return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
@@ -304,10 +313,7 @@ def load_settings(
     data["profile_name"] = profile
     data["project_root"] = root
     models_dir = config_dir / "models"
-    data["baselines"] = _read_yaml(models_dir / "baselines.yaml")
-    data["model_specs"] = {
-        name: _read_yaml(models_dir / f"{name}.yaml") for name in MODEL_FILES if name != "baselines"
-    }
+    data["model_specs"] = {name: _read_yaml(models_dir / f"{name}.yaml") for name in MODEL_FILES}
     try:
         return Settings.model_validate(data)
     except ValueError as exc:  # pydantic.ValidationError subclasses ValueError

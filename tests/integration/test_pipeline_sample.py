@@ -1,4 +1,4 @@
-"""`nsefc run --sample --no-serve` end to end (§16.1, §16.5, AC-07 to AC-09)."""
+"""`nsefc run --sample --no-serve` end to end: published files, models, champion, caching."""
 
 from __future__ import annotations
 
@@ -46,7 +46,7 @@ def test_status_says_sample_and_is_never_stale(sample_run: CliRun) -> None:
 
 
 def test_every_universe_security_has_a_forecast_or_a_reason(sample_run: CliRun) -> None:
-    """AC-09."""
+    """Every forecast-universe stock has a forecast with an 80% range, or a valid reason."""
     status = read_json(api(sample_run) / "status.json")
     release = api(sample_run) / "r" / status["release_id"]
     stocks = read_json(release / "stocks.json")["items"]
@@ -66,7 +66,7 @@ def test_every_universe_security_has_a_forecast_or_a_reason(sample_run: CliRun) 
 
 
 def test_every_model_went_through_the_gates(sample_run: CliRun) -> None:
-    """AC-07 and AC-08: baselines and at least two ML candidates, a champion by the gates."""
+    """Baselines and at least two ML candidates, and a champion chosen by the gates."""
     evaluation = read_json(sample_run.data_dir / "reports" / "evaluation.json")
     ids = {m["model_id"] for m in evaluation["models"]}
     assert {"B0", "B1", "B2", "B3", "ridge", "huber", "lightgbm"} <= ids
@@ -101,7 +101,7 @@ def test_run_records_and_logs(sample_run: CliRun) -> None:
 
 
 def test_a_repeat_run_is_cached_and_byte_identical(sample_run: CliRun) -> None:
-    """§16.1 idempotency and caching."""
+    """Idempotency and caching."""
     before = snapshot(api(sample_run))
     release = read_json(api(sample_run) / "status.json")["release_id"]
     again = cli(["run", "--sample", "--no-serve"], sample_run.data_dir)

@@ -1,4 +1,4 @@
-// Initial JavaScript budget: 150 KB gzipped (NFR-04).
+// Initial JavaScript budget: 150 KB gzipped.
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";

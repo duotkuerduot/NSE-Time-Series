@@ -216,7 +216,7 @@
     }
   },
   "additionalProperties": false,
-  "description": "Pointer to the current release, plus run and data status (§13.3).",
+  "description": "Pointer to the current release, plus run and data status.",
   "properties": {
     "api_version": {
       "const": "1",

@@ -1,7 +1,7 @@
 """NSE trading calendar and session arithmetic.
 
 Every other module uses ``is_scheduled_session``, ``next_session``, ``previous_session`` and
-``sessions_between``; nobody computes "tomorrow" with date arithmetic (ENGINEERING.md 7.5).
+``sessions_between``; nobody computes "tomorrow" with date arithmetic.
 """
 
 from pathlib import Path

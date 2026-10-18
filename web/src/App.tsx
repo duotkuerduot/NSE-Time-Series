@@ -5,7 +5,7 @@ import { HomePage } from "./pages/HomePage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { StockPage } from "./pages/StockPage";
 
-// Three routes (ENGINEERING.md 23.1) plus a not-found page.
+// Three routes plus a not-found page (docs/architecture.md, The web app).
 export function App() {
   return (
     <Routes>
